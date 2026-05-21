@@ -1452,8 +1452,9 @@ static void paintTab(HWND hWnd, HDC hdc, const RECT& rect)
 
 	int iTab = iSelTab;
 
-	if (const auto nStyle = ::GetWindowLongPtr(hWnd, GWL_STYLE);
-		(nStyle & TCS_BUTTONS) == TCS_BUTTONS)
+	const auto nStyle = ::GetWindowLongPtr(hWnd, GWL_STYLE);
+
+	if ((nStyle & TCS_BUTTONS) == TCS_BUTTONS)
 	{
 		iTab = nTabs - 1;
 	}
@@ -1484,10 +1485,31 @@ static void paintTab(HWND hWnd, HDC hdc, const RECT& rect)
 
 	::SetBkMode(hdc, TRANSPARENT);
 
+	const bool isOwnerDraw = (nStyle & TCS_OWNERDRAWFIXED) != 0;
+
 	for (int i = 0; i < nTabs; ++i)
 	{
 		RECT rcItem{};
 		TabCtrl_GetItemRect(hWnd, i, &rcItem);
+
+		if (isOwnerDraw)
+		{
+			const DRAWITEMSTRUCT dis{
+				ODT_TAB
+				, 0
+				, static_cast<UINT>(i)
+				, ODA_DRAWENTIRE
+				, ODS_DEFAULT
+				, hWnd
+				, hdc
+				, rcItem
+				, 0
+			};
+
+			::SetTextColor(hdc, (iSelTab == i) ? dmlib::getTextColor() : dmlib::getDarkerTextColor());
+			::SendMessage(::GetParent(hWnd), WM_DRAWITEM, 0, reinterpret_cast<LPARAM>(&dis));
+			continue;
+		}
 
 		if (RECT rcIntersect{};
 			::IntersectRect(&rcIntersect, &rect, &rcItem) == FALSE)
@@ -1540,8 +1562,8 @@ LRESULT CALLBACK dmlib_subclass::TabPaintSubclass(
 	auto* pTabData = reinterpret_cast<TabData*>(dwRefData);
 	const auto& hMemDC = pTabData->m_bufferData.getHMemDC();
 
-	if (const auto nStyle = ::GetWindowLongPtrW(hWnd, GWL_STYLE);
-		((nStyle & (TCS_VERTICAL | TCS_OWNERDRAWFIXED)) != 0)
+	if (const auto nStyle = ::GetWindowLongPtr(hWnd, GWL_STYLE);
+		((nStyle & TCS_VERTICAL) != 0)
 		&& (uMsg != WM_NCDESTROY))
 	{
 		return ::DefSubclassProc(hWnd, uMsg, wParam, lParam);
