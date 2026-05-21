@@ -25,6 +25,7 @@
 
 #if defined(_DARKMODELIB_USE_SCROLLBAR_FIX) && (_DARKMODELIB_USE_SCROLLBAR_FIX > 0)
 #include <mutex>
+#include <string_view>
 #include <unordered_set>
 #endif
 
@@ -53,8 +54,8 @@ static auto ReplaceFunction(IMAGE_THUNK_DATA* addr, const P& newFunction) noexce
 		return nullptr;
 	}
 
-	const uintptr_t oldFunction = addr->u1.Function;
-	addr->u1.Function = reinterpret_cast<uintptr_t>(newFunction);
+	const ULONGLONG oldFunction = addr->u1.Function;
+	addr->u1.Function = reinterpret_cast<ULONGLONG>(newFunction);
 	::VirtualProtect(addr, sizeof(IMAGE_THUNK_DATA), oldProtect, &oldProtect);
 	return reinterpret_cast<P>(oldFunction);
 }
@@ -170,7 +171,7 @@ static fnOpenNcThemeData pfOpenNcThemeData = nullptr;
 
 bool dmlib_hook::loadOpenNcThemeData(const HMODULE& hUxtheme) noexcept
 {
-	return LoadFn(hUxtheme, pfOpenNcThemeData, 49);
+	return dmlib_module::LoadFn(hUxtheme, pfOpenNcThemeData, 49);
 }
 
 #if defined(_DARKMODELIB_USE_SCROLLBAR_FIX) && (_DARKMODELIB_USE_SCROLLBAR_FIX > 1)
@@ -182,8 +183,13 @@ static std::mutex g_darkScrollBarMutex;
  * @brief Makes scroll bars on the specified window and all its children consistent.
  *
  * @note Currently not widely used by default.
+ *       If possible, try to use `dmlib::setDarkExplorerTheme`
+ *       or `dmlib::setDarkThemeExperimental` instead.
  *
  * @param[in] hWnd Handle to the parent window.
+ *
+ * @see dmlib::setDarkExplorerTheme()
+ * @see dmlib::setDarkThemeExperimental()
  */
 void dmlib_hook::enableDarkScrollBarForWindowAndChildren(HWND hWnd)
 {
@@ -231,7 +237,7 @@ static HTHEME WINAPI MyOpenNcThemeData(HWND hWnd, LPCWSTR pszClassList)
 
 void dmlib_hook::fixDarkScrollBar()
 {
-	const ModuleHandle moduleComctl(L"comctl32.dll");
+	const dmlib_module::ModuleHandle moduleComctl(L"comctl32.dll");
 	if (moduleComctl.isLoaded())
 	{
 		auto* addr = iat_hook::FindDelayLoadThunkInModule(moduleComctl.get(), "uxtheme.dll", 49); // OpenNcThemeData
