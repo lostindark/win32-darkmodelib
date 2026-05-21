@@ -42,7 +42,8 @@ dmlib::Colors dmlib_color::getLightColors() noexcept
 		::GetSysColor(COLOR_HOTLIGHT),      // linkTextColor
 		dmlib_color::HEXRGB(0x8D8D8D),      // edgeColor
 		::GetSysColor(COLOR_HIGHLIGHT),     // hotEdgeColor
-		::GetSysColor(COLOR_GRAYTEXT)       // disabledEdgeColor
+		::GetSysColor(COLOR_GRAYTEXT),      // disabledEdgeColor
+		::GetSysColor(COLOR_HOTLIGHT)       // highlight
 	};
 }
 

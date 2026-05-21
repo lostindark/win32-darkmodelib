@@ -51,6 +51,7 @@ EXPORTS
 	getEdgeColor
 	getHotEdgeColor
 	getDisabledEdgeColor
+	getHighlightColor
 	getBackgroundBrush
 	getDlgBackgroundBrush
 	getCtrlBackgroundBrush
@@ -59,12 +60,12 @@ EXPORTS
 	getEdgeBrush
 	getHotEdgeBrush
 	getDisabledEdgeBrush
-	getHighlightEdgeBrush
+	getHighlightBrush
 	getDarkerTextPen
 	getEdgePen
 	getHotEdgePen
 	getDisabledEdgePen
-	getHighlightEdgePen
+	getHighlightPen
 	setViewBackgroundColor
 	setViewTextColor
 	setViewGridlinesColor

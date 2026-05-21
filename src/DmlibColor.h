@@ -40,7 +40,8 @@ namespace dmlib_color
 		dmlib_color::HEXRGB(0x60CDFF),   // linkTextColor
 		dmlib_color::HEXRGB(0x646464),   // edgeColor
 		dmlib_color::HEXRGB(0x9B9B9B),   // hotEdgeColor
-		dmlib_color::HEXRGB(0x484848)    // disabledEdgeColor
+		dmlib_color::HEXRGB(0x484848),   // disabledEdgeColor
+		dmlib_color::HEXRGB(0x60CDFF)    // highlight
 	};
 
 	inline constexpr DWORD kOffsetEdge = dmlib_color::HEXRGB(0x1C1C1C);
@@ -59,7 +60,8 @@ namespace dmlib_color
 		kDarkColors.linkText,
 		kDarkColors.edge + kOffsetEdge + kOffsetRed,
 		kDarkColors.hotEdge + kOffsetRed,
-		kDarkColors.disabledEdge + kOffsetRed
+		kDarkColors.disabledEdge + kOffsetRed,
+		kDarkColors.highlight
 	};
 
 	/// Green tone
@@ -76,7 +78,8 @@ namespace dmlib_color
 		kDarkColors.linkText,
 		kDarkColors.edge + kOffsetEdge + kOffsetGreen,
 		kDarkColors.hotEdge + kOffsetGreen,
-		kDarkColors.disabledEdge + kOffsetGreen
+		kDarkColors.disabledEdge + kOffsetGreen,
+		kDarkColors.highlight
 	};
 
 	/// Blue tone
@@ -93,7 +96,8 @@ namespace dmlib_color
 		kDarkColors.linkText,
 		kDarkColors.edge + kOffsetEdge + kOffsetBlue,
 		kDarkColors.hotEdge + kOffsetBlue,
-		kDarkColors.disabledEdge + kOffsetBlue
+		kDarkColors.disabledEdge + kOffsetBlue,
+		kDarkColors.highlight
 	};
 
 	/// Purple tone
@@ -110,7 +114,8 @@ namespace dmlib_color
 		kDarkColors.linkText,
 		kDarkColors.edge + kOffsetEdge + kOffsetPurple,
 		kDarkColors.hotEdge + kOffsetPurple,
-		kDarkColors.disabledEdge + kOffsetPurple
+		kDarkColors.disabledEdge + kOffsetPurple,
+		kDarkColors.highlight
 	};
 
 	/// Cyan tone
@@ -127,7 +132,8 @@ namespace dmlib_color
 		kDarkColors.linkText,
 		kDarkColors.edge + kOffsetEdge + kOffsetCyan,
 		kDarkColors.hotEdge + kOffsetCyan,
-		kDarkColors.disabledEdge + kOffsetCyan
+		kDarkColors.disabledEdge + kOffsetCyan,
+		kDarkColors.highlight
 	};
 
 	/// Olive tone
@@ -144,7 +150,8 @@ namespace dmlib_color
 		kDarkColors.linkText,
 		kDarkColors.edge + kOffsetEdge + kOffsetOlive,
 		kDarkColors.hotEdge + kOffsetOlive,
-		kDarkColors.disabledEdge + kOffsetOlive
+		kDarkColors.disabledEdge + kOffsetOlive,
+		kDarkColors.highlight
 	};
 
 	/// Dark views colors
@@ -189,7 +196,7 @@ namespace dmlib_color
 		HBRUSH m_edge = nullptr;
 		HBRUSH m_hotEdge = nullptr;
 		HBRUSH m_disabledEdge = nullptr;
-		HBRUSH m_highlightEdge = nullptr;
+		HBRUSH m_highlight = nullptr;
 
 		Brushes() = delete;
 
@@ -203,7 +210,8 @@ namespace dmlib_color
 			, m_edge(::CreateSolidBrush(colors.edge))
 			, m_hotEdge(::CreateSolidBrush(colors.hotEdge))
 			, m_disabledEdge(::CreateSolidBrush(colors.disabledEdge))
-			, m_highlightEdge(::CreateSolidBrush(colors.linkText))
+
+			, m_highlight(::CreateSolidBrush(colors.highlight))
 		{}
 
 		Brushes(const Brushes&) = delete;
@@ -223,7 +231,8 @@ namespace dmlib_color
 			::DeleteObject(m_edge);             m_edge = nullptr;
 			::DeleteObject(m_hotEdge);          m_hotEdge = nullptr;
 			::DeleteObject(m_disabledEdge);     m_disabledEdge = nullptr;
-			::DeleteObject(m_highlightEdge);    m_highlightEdge = nullptr;
+
+			::DeleteObject(m_highlight);        m_highlight = nullptr;
 		}
 
 		void updateBrushes(const dmlib::Colors& colors) noexcept
@@ -237,7 +246,8 @@ namespace dmlib_color
 			::DeleteObject(m_edge);
 			::DeleteObject(m_hotEdge);
 			::DeleteObject(m_disabledEdge);
-			::DeleteObject(m_highlightEdge);
+
+			::DeleteObject(m_highlight);
 
 			m_background = ::CreateSolidBrush(colors.background);
 			m_ctrlBackground = ::CreateSolidBrush(colors.ctrlBackground);
@@ -248,7 +258,8 @@ namespace dmlib_color
 			m_edge = ::CreateSolidBrush(colors.edge);
 			m_hotEdge = ::CreateSolidBrush(colors.hotEdge);
 			m_disabledEdge = ::CreateSolidBrush(colors.disabledEdge);
-			m_highlightEdge = ::CreateSolidBrush(colors.linkText);
+
+			m_highlight = ::CreateSolidBrush(colors.highlight);
 		}
 	};
 
@@ -258,7 +269,7 @@ namespace dmlib_color
 		HPEN m_edge = nullptr;
 		HPEN m_hotEdge = nullptr;
 		HPEN m_disabledEdge = nullptr;
-		HPEN m_highlightEdge = nullptr;
+		HPEN m_highlight = nullptr;
 
 		Pens() = delete;
 
@@ -267,7 +278,7 @@ namespace dmlib_color
 			, m_edge(::CreatePen(PS_SOLID, 1, colors.edge))
 			, m_hotEdge(::CreatePen(PS_SOLID, 1, colors.hotEdge))
 			, m_disabledEdge(::CreatePen(PS_SOLID, 1, colors.disabledEdge))
-			, m_highlightEdge(::CreatePen(PS_SOLID, 1, colors.linkText))
+			, m_highlight(::CreatePen(PS_SOLID, 1, colors.highlight))
 		{}
 
 		Pens(const Pens&) = delete;
@@ -282,7 +293,7 @@ namespace dmlib_color
 			::DeleteObject(m_edge);          m_edge = nullptr;
 			::DeleteObject(m_hotEdge);       m_hotEdge = nullptr;
 			::DeleteObject(m_disabledEdge);  m_disabledEdge = nullptr;
-			::DeleteObject(m_highlightEdge); m_highlightEdge = nullptr;
+			::DeleteObject(m_highlight);     m_highlight = nullptr;
 		}
 
 		void updatePens(const dmlib::Colors& colors) noexcept
@@ -291,13 +302,13 @@ namespace dmlib_color
 			::DeleteObject(m_edge);
 			::DeleteObject(m_hotEdge);
 			::DeleteObject(m_disabledEdge);
-			::DeleteObject(m_highlightEdge);
+			::DeleteObject(m_highlight);
 
 			m_darkerText = ::CreatePen(PS_SOLID, 1, colors.darkerText);
 			m_edge = ::CreatePen(PS_SOLID, 1, colors.edge);
 			m_hotEdge = ::CreatePen(PS_SOLID, 1, colors.hotEdge);
 			m_disabledEdge = ::CreatePen(PS_SOLID, 1, colors.disabledEdge);
-			m_highlightEdge = ::CreatePen(PS_SOLID, 1, colors.linkText);
+			m_highlight = ::CreatePen(PS_SOLID, 1, colors.highlight);
 		}
 	};
 
@@ -495,6 +506,11 @@ namespace dmlib_color
 		COLORREF setColorDisabledEdge(COLORREF newClr) noexcept
 		{
 			return setNewColor(m_colors.disabledEdge, newClr);
+		}
+
+		COLORREF setColorHighlight(COLORREF newClr) noexcept
+		{
+			return setNewColor(m_colors.highlight, newClr);
 		}
 
 		[[nodiscard]] const dmlib::Colors& getColors() const noexcept

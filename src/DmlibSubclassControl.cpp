@@ -1395,10 +1395,12 @@ static void paintTabItem(
 		rcText.left += cx;
 	}
 
-	if (dmlib::isAtLeastWindows11() && isSelectedTab)
+	if (dmlib::getHighlightColor() != dmlib::getCtrlBackgroundColor()
+		&& dmlib::isAtLeastWindows11()
+		&& isSelectedTab)
 	{
-		const RECT rcHighliteLine{ rcFrame.left + 1, rcFrame.top + 1, rcFrame.right - 1, rcFrame.top + paddingTop + 1 };
-		dmlib_paint::paintRect(hdc, rcHighliteLine, dmlib::getHighlightEdgePen(), dmlib::getHighlightEdgeBrush());
+		const RECT rcHighlightLine{ rcFrame.left + 1, rcFrame.top + 1, rcFrame.right - 1, rcFrame.top + paddingTop + 1 };
+		dmlib_paint::paintRect(hdc, rcHighlightLine, dmlib::getHighlightPen(), dmlib::getHighlightBrush());
 	}
 
 	::DrawText(hdc, buffer.c_str(), -1, &rcText, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
@@ -1720,10 +1722,13 @@ static void ncPaintCustomBorder(HWND hWnd, const dmlib_subclass::BorderMetricsDa
 		roundness
 	);
 
-	if (dmlib::isAtLeastWindows11() && hasFocus && borderMetricsData.m_isEdit)
+	if (dmlib::getHighlightColor() != dmlib::getCtrlBackgroundColor()
+		&& dmlib::isAtLeastWindows11()
+		&& hasFocus
+		&& borderMetricsData.m_isEdit)
 	{
-		const RECT rcHighliteBottomLine{ rcClient.left, rcClient.bottom - dmlib_dpi::scale(2, hWnd), rcClient.right, rcClient.bottom};
-		dmlib_paint::paintRoundRect(hdc, rcHighliteBottomLine, dmlib::getHighlightEdgePen(), dmlib::getHighlightEdgeBrush(), roundness, roundness);
+		const RECT rcHighlightBottomLine{ rcClient.left, rcClient.bottom - dmlib_dpi::scale(2, hWnd), rcClient.right, rcClient.bottom};
+		dmlib_paint::paintRoundRect(hdc, rcHighlightBottomLine, dmlib::getHighlightPen(), dmlib::getHighlightBrush(), roundness, roundness);
 	}
 
 	::ReleaseDC(hWnd, hdc);

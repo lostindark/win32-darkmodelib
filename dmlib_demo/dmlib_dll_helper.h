@@ -562,6 +562,9 @@ namespace dmlib
 	using fnGetDisabledEdgeColor = auto (*)() -> COLORREF;
 	inline fnGetDisabledEdgeColor getDisabledEdgeColor = nullptr;
 
+	using fnGetHighlightColor = auto (*)() -> COLORREF;
+	inline fnGetHighlightColor getHighlightColor = nullptr;
+
 	using fnGetBackgroundBrush = auto (*)() -> HBRUSH;
 	inline fnGetBackgroundBrush getBackgroundBrush = nullptr;
 
@@ -586,8 +589,8 @@ namespace dmlib
 	using fnGetDisabledEdgeBrush = auto (*)() -> HBRUSH;
 	inline fnGetDisabledEdgeBrush getDisabledEdgeBrush = nullptr;
 
-	using fnGetHighlightEdgeBrush = auto (*)() -> HBRUSH;
-	inline fnGetHighlightEdgeBrush getHighlightEdgeBrush = nullptr;
+	using fnGetHighlightBrush = auto (*)() -> HBRUSH;
+	inline fnGetHighlightBrush getHighlightBrush = nullptr;
 
 	using fnGetDarkerTextPen = auto (*)() -> HPEN;
 	inline fnGetDarkerTextPen getDarkerTextPen = nullptr;
@@ -601,8 +604,8 @@ namespace dmlib
 	using fnGetDisabledEdgePen = auto (*)() -> HPEN;
 	inline fnGetDisabledEdgePen getDisabledEdgePen = nullptr;
 
-	using fnGetHighlightEdgePen = auto (*)() -> HPEN;
-	inline fnGetHighlightEdgePen getHighlightEdgePen = nullptr;
+	using fnGetHighlightPen = auto (*)() -> HPEN;
+	inline fnGetHighlightPen getHighlightPen = nullptr;
 
 	using fnSetViewBackgroundColor = auto (*)(COLORREF clrNew) -> COLORREF;
 	inline fnSetViewBackgroundColor setViewBackgroundColor = nullptr;

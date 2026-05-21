@@ -296,6 +296,7 @@ COLORREF dmlib::getLinkTextColor()          { return getTheme().getColors().link
 COLORREF dmlib::getEdgeColor()              { return getTheme().getColors().edge; }
 COLORREF dmlib::getHotEdgeColor()           { return getTheme().getColors().hotEdge; }
 COLORREF dmlib::getDisabledEdgeColor()      { return getTheme().getColors().disabledEdge; }
+COLORREF dmlib::getHighlightColor()         { return getTheme().getColors().highlight; }
 
 HBRUSH dmlib::getBackgroundBrush()          { return getTheme().getBrushes().m_background; }
 HBRUSH dmlib::getCtrlBackgroundBrush()      { return getTheme().getBrushes().m_ctrlBackground; }
@@ -306,13 +307,15 @@ HBRUSH dmlib::getErrorBackgroundBrush()     { return getTheme().getBrushes().m_e
 HBRUSH dmlib::getEdgeBrush()                { return getTheme().getBrushes().m_edge; }
 HBRUSH dmlib::getHotEdgeBrush()             { return getTheme().getBrushes().m_hotEdge; }
 HBRUSH dmlib::getDisabledEdgeBrush()        { return getTheme().getBrushes().m_disabledEdge; }
-HBRUSH dmlib::getHighlightEdgeBrush()       { return getTheme().getBrushes().m_highlightEdge; }
+
+HBRUSH dmlib::getHighlightBrush()           { return getTheme().getBrushes().m_highlight; }
 
 HPEN dmlib::getDarkerTextPen()              { return getTheme().getPens().m_darkerText; }
 HPEN dmlib::getEdgePen()                    { return getTheme().getPens().m_edge; }
 HPEN dmlib::getHotEdgePen()                 { return getTheme().getPens().m_hotEdge; }
 HPEN dmlib::getDisabledEdgePen()            { return getTheme().getPens().m_disabledEdge; }
-HPEN dmlib::getHighlightEdgePen()           { return getTheme().getPens().m_highlightEdge; }
+
+HPEN dmlib::getHighlightPen()               { return getTheme().getPens().m_highlight; }
 
 COLORREF dmlib::setViewBackgroundColor(COLORREF clrNew)         { return getThemeView().setColorBackground(clrNew); }
 COLORREF dmlib::setViewTextColor(COLORREF clrNew)               { return getThemeView().setColorText(clrNew); }
@@ -660,7 +663,7 @@ static void initOptions(const std::wstring& iniName)
 			{L"edgeHeader", &getThemeView().getToSetColors().headerEdge}
 		} };
 
-		static constexpr size_t nColorsMembers = 12;
+		static constexpr size_t nColorsMembers = 13;
 		const std::array<ColorEntry, nColorsMembers> baseColors{ {
 			{L"background", &getTheme().getToSetColors().background},
 			{L"backgroundCtrl", &getTheme().getToSetColors().ctrlBackground},
@@ -673,7 +676,8 @@ static void initOptions(const std::wstring& iniName)
 			{L"textLink", &getTheme().getToSetColors().linkText},
 			{L"edge", &getTheme().getToSetColors().edge},
 			{L"edgeHot", &getTheme().getToSetColors().hotEdge},
-			{L"edgeDisabled", &getTheme().getToSetColors().disabledEdge}
+			{L"edgeDisabled", &getTheme().getToSetColors().disabledEdge},
+			{L"highlight", &getTheme().getToSetColors().highlight}
 		} };
 
 		for (const auto& entry : viewColors)

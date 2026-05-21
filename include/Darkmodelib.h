@@ -72,6 +72,7 @@ namespace dmlib
 		COLORREF edge = 0;
 		COLORREF hotEdge = 0;
 		COLORREF disabledEdge = 0;
+		COLORREF highlight = 0;
 	};
 
 	struct ColorsView
@@ -342,6 +343,8 @@ namespace dmlib
 	[[nodiscard]] DMLIB_API COLORREF getHotEdgeColor();
 	[[nodiscard]] DMLIB_API COLORREF getDisabledEdgeColor();
 
+	[[nodiscard]] DMLIB_API COLORREF getHighlightColor();
+
 	[[nodiscard]] DMLIB_API HBRUSH getBackgroundBrush();
 	[[nodiscard]] DMLIB_API HBRUSH getDlgBackgroundBrush();
 	[[nodiscard]] DMLIB_API HBRUSH getCtrlBackgroundBrush();
@@ -351,13 +354,15 @@ namespace dmlib
 	[[nodiscard]] DMLIB_API HBRUSH getEdgeBrush();
 	[[nodiscard]] DMLIB_API HBRUSH getHotEdgeBrush();
 	[[nodiscard]] DMLIB_API HBRUSH getDisabledEdgeBrush();
-	[[nodiscard]] DMLIB_API HBRUSH getHighlightEdgeBrush();
+
+	[[nodiscard]] DMLIB_API HBRUSH getHighlightBrush();
 
 	[[nodiscard]] DMLIB_API HPEN getDarkerTextPen();
 	[[nodiscard]] DMLIB_API HPEN getEdgePen();
 	[[nodiscard]] DMLIB_API HPEN getHotEdgePen();
 	[[nodiscard]] DMLIB_API HPEN getDisabledEdgePen();
-	[[nodiscard]] DMLIB_API HPEN getHighlightEdgePen();
+
+	[[nodiscard]] DMLIB_API HPEN getHighlightPen();
 
 	DMLIB_API COLORREF setViewBackgroundColor(COLORREF clrNew);
 	DMLIB_API COLORREF setViewTextColor(COLORREF clrNew);
