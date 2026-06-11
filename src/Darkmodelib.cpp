@@ -19,7 +19,7 @@
 
 #include "Darkmodelib.h"
 
-#if !defined(_DARKMODELIB_NOT_USED)
+#ifndef _DARKMODELIB_NOT_USED
 
 #include <windows.h>
 
@@ -35,7 +35,7 @@
 #include "DmlibColor.h"
 #include "DmlibDpi.h"
 #include "DmlibHook.h"
-#if !defined(_DARKMODELIB_NO_INI_CONFIG)
+#ifndef _DARKMODELIB_NO_INI_CONFIG
 #include "DmlibIni.h"
 #endif
 #include "DmlibSubclass.h"
@@ -89,7 +89,7 @@ int dmlib::getLibInfo(int libInfoType)
 
 		case LibInfo::iniConfigUsed:
 		{
-#if !defined(_DARKMODELIB_NO_INI_CONFIG)
+#ifndef _DARKMODELIB_NO_INI_CONFIG
 			return TRUE;
 #else
 			return FALSE;
@@ -98,7 +98,7 @@ int dmlib::getLibInfo(int libInfoType)
 
 		case LibInfo::allowOldOS:
 		{
-#if defined(_DARKMODELIB_ALLOW_OLD_OS)
+#ifdef _DARKMODELIB_ALLOW_OLD_OS
 			return _DARKMODELIB_ALLOW_OLD_OS;
 #else
 			return FALSE;
@@ -107,7 +107,7 @@ int dmlib::getLibInfo(int libInfoType)
 
 		case LibInfo::useDlgProcCtl:
 		{
-#if defined(_DARKMODELIB_DLG_PROC_CTLCOLOR_RETURNS)
+#ifdef _DARKMODELIB_DLG_PROC_CTLCOLOR_RETURNS
 			return _DARKMODELIB_DLG_PROC_CTLCOLOR_RETURNS;
 #else
 			return FALSE;
@@ -116,7 +116,7 @@ int dmlib::getLibInfo(int libInfoType)
 
 		case LibInfo::preferTheme:
 		{
-#if defined(_DARKMODELIB_PREFER_THEME)
+#ifdef _DARKMODELIB_PREFER_THEME
 			return _DARKMODELIB_PREFER_THEME;
 #else
 			return FALSE;
@@ -125,7 +125,7 @@ int dmlib::getLibInfo(int libInfoType)
 
 		case LibInfo::useSBFix:
 		{
-#if defined(_DARKMODELIB_USE_SCROLLBAR_FIX)
+#ifdef _DARKMODELIB_USE_SCROLLBAR_FIX
 			return _DARKMODELIB_USE_SCROLLBAR_FIX;
 #else
 			return FALSE;
@@ -182,7 +182,7 @@ struct DarkModeParams
 /// Threshold range around 50.0 where TreeView uses classic style instead of light/dark.
 static constexpr double kMiddleGrayRange = 2.0;
 
-#if defined(__clang__)
+#ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wexit-time-destructors"
 #pragma clang diagnostic ignored "-Wglobal-constructors"
@@ -207,7 +207,7 @@ namespace // anonymous
 		bool m_isInit = false;
 		bool m_isInitExperimental = false;
 
-#if !defined(_DARKMODELIB_NO_INI_CONFIG)
+#ifndef _DARKMODELIB_NO_INI_CONFIG
 		std::wstring m_iniName;
 		bool m_isIniNameSet = false;
 		bool m_iniExist = false;
@@ -254,7 +254,7 @@ static dmlib_color::ThemeView& getThemeView() noexcept
 	return tView;
 }
 
-#if defined(__clang__)
+#ifdef __clang__
 #pragma clang diagnostic pop
 #endif
 
@@ -570,7 +570,7 @@ void dmlib::setColorizeTitleBarConfig(bool colorize)
 	g_dmCfg.m_colorizeTitleBar = colorize;
 }
 
-#if !defined(_DARKMODELIB_NO_INI_CONFIG)
+#ifndef _DARKMODELIB_NO_INI_CONFIG
 /**
  * @brief Initializes dark mode configuration and colors from an INI file.
  *
@@ -779,7 +779,7 @@ void dmlib::initDarkModeEx([[maybe_unused]] const wchar_t* iniName)
 			g_dmCfg.m_isInitExperimental = true;
 		}
 
-#if !defined(_DARKMODELIB_NO_INI_CONFIG)
+#ifndef _DARKMODELIB_NO_INI_CONFIG
 		if (!g_dmCfg.m_isIniNameSet)
 		{
 			g_dmCfg.m_iniName = iniName;
@@ -824,7 +824,7 @@ void dmlib::initDarkMode()
  */
 bool dmlib::doesConfigFileExist()
 {
-#if !defined(_DARKMODELIB_NO_INI_CONFIG)
+#ifndef _DARKMODELIB_NO_INI_CONFIG
 	return g_dmCfg.m_iniExist;
 #else
 	return false;
@@ -1210,7 +1210,7 @@ void dmlib::removeUpDownCtrlSubclass(HWND hWnd)
  * @see DarkModeParams
  * @see dmlib::setUpDownCtrlSubclass()
  */
-static void setUpDownCtrlSubclassAndTheme(HWND hWnd, DarkModeParams p) noexcept
+static void setUpDownCtrlSubclassAndTheme(HWND hWnd, DarkModeParams p)
 {
 	if (p.m_theme)
 	{
@@ -1394,7 +1394,7 @@ void dmlib::removeCustomBorderForListBoxOrEditCtrlSubclass(HWND hWnd)
  * @see DarkModeParams
  * @see dmlib::setCustomBorderForListBoxOrEditCtrlSubclass()
  */
-static void setCustomBorderForListBoxOrEditCtrlSubclassAndTheme(HWND hWnd, DarkModeParams p, bool isListBox) noexcept
+static void setCustomBorderForListBoxOrEditCtrlSubclassAndTheme(HWND hWnd, DarkModeParams p, bool isListBox)
 {
 	const auto nStyle = ::GetWindowLongPtr(hWnd, GWL_STYLE);
 	const bool hasScrollBar = ((nStyle & WS_HSCROLL) == WS_HSCROLL) || ((nStyle & WS_VSCROLL) == WS_VSCROLL);
@@ -1656,7 +1656,7 @@ void dmlib::removeListViewCtrlSubclass(HWND hWnd)
  * @see dmlib::setListViewCtrlSubclass()
  * @see dmlib::setHeaderCtrlSubclass()
  */
-static void setListViewCtrlSubclassAndTheme(HWND hWnd, DarkModeParams p) noexcept
+static void setListViewCtrlSubclassAndTheme(HWND hWnd, DarkModeParams p)
 {
 	auto* hHeader = ListView_GetHeader(hWnd);
 
@@ -2083,7 +2083,7 @@ static void setDTPCtrlSubclassAndTheme(HWND hWnd, DarkModeParams p) noexcept
  * @see dmlib::setTreeViewWindowTheme()
  * @see dmlib::setDarkTooltips()
  */
-static void setTreeViewCtrlTheme(HWND hWnd, DarkModeParams p)
+static void setTreeViewCtrlTheme(HWND hWnd, DarkModeParams p) noexcept
 {
 	if (p.m_theme)
 	{
@@ -3491,7 +3491,7 @@ void dmlib::setTreeViewWindowThemeEx(HWND hWnd, bool force)
 	auto nStyle = ::GetWindowLongPtr(hWnd, GWL_STYLE);
 	const bool hasHotStyle = (nStyle & TVS_TRACKSELECT) == TVS_TRACKSELECT;
 	bool change = false;
-	std::wstring strSubAppName;
+	const wchar_t* strSubAppName = nullptr;
 
 	switch (static_cast<TreeViewStyle>(dmlib::getTreeViewStyle()))
 	{
@@ -3528,7 +3528,6 @@ void dmlib::setTreeViewWindowThemeEx(HWND hWnd, bool force)
 				nStyle &= ~TVS_TRACKSELECT;
 				change = true;
 			}
-			strSubAppName = L"";
 			break;
 		}
 	}
@@ -3538,7 +3537,7 @@ void dmlib::setTreeViewWindowThemeEx(HWND hWnd, bool force)
 		::SetWindowLongPtr(hWnd, GWL_STYLE, nStyle);
 	}
 
-	::SetWindowTheme(hWnd, strSubAppName.empty() ? nullptr : strSubAppName.c_str(), nullptr);
+	::SetWindowTheme(hWnd, strSubAppName, nullptr);
 }
 
 /**
@@ -4162,12 +4161,12 @@ static TASKDIALOGCONFIG msgBoxParamToTaskDlgConfig(HWND hWnd, LPCWSTR lpText, LP
 {
 	// base config
 
-#if defined(_MSC_VER)
+#ifdef _MSC_VER
 	#pragma warning(push)
 	#pragma warning(disable: 26476) // Expression/symbol 'name' uses a naked union 'union' with multiple type pointers: Use variant instead (type.7)
 #endif
 	TASKDIALOGCONFIG tdc{};
-#if defined(_MSC_VER)
+#ifdef _MSC_VER
 	#pragma warning(pop)
 #endif
 	tdc.cbSize = sizeof(TASKDIALOGCONFIG);

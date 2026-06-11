@@ -16,8 +16,11 @@
 
 #include <uxtheme.h>
 
+#include <algorithm>
+#include <array>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <type_traits>
 
 namespace dmlib_subclass
@@ -181,9 +184,11 @@ namespace dmlib_subclass
 	public:
 		ThemeData() = delete;
 
-		explicit ThemeData(const std::wstring& themeClass) noexcept
-			: m_themeClass(themeClass)
-		{}
+		explicit ThemeData(std::wstring_view themeClass) noexcept
+		{
+			const size_t copyLength = std::min(themeClass.size(), m_themeClass.size() - 1);
+			std::copy_n(themeClass.begin(), copyLength, m_themeClass.begin());
+		}
 
 		ThemeData(const ThemeData&) = delete;
 		ThemeData& operator=(const ThemeData&) = delete;
@@ -200,7 +205,7 @@ namespace dmlib_subclass
 		{
 			if (m_hTheme == nullptr && !m_themeClass.empty())
 			{
-				m_hTheme = ::OpenThemeData(hWnd, m_themeClass.c_str());
+				m_hTheme = ::OpenThemeData(hWnd, m_themeClass.data());
 			}
 			return m_hTheme != nullptr;
 		}
@@ -220,7 +225,7 @@ namespace dmlib_subclass
 		}
 
 	private:
-		const std::wstring m_themeClass;
+		std::array<wchar_t, 32> m_themeClass{};
 		HTHEME m_hTheme = nullptr;
 	};
 

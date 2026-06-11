@@ -23,7 +23,7 @@
 	&& (defined(__x86_64__) || defined(_M_X64)\
 	|| defined(__arm64__) || defined(__arm64) || defined(_M_ARM64))*/
 
-#if defined(_MSC_VER)
+#ifdef _MSC_VER
 #pragma comment(lib, "dwmapi.lib")
 #pragma comment(lib, "uxtheme.lib")
 #pragma comment(lib, "Comctl32.lib")
@@ -31,7 +31,7 @@
 #pragma comment(lib, "Shlwapi.lib")
 #endif
 
-#if defined(DMLIB_DLL)
+#ifdef DMLIB_DLL
 	#if defined(DMLIB_EXPORTS)
 		#define DMLIB_API __declspec(dllexport)
 	#else
@@ -41,15 +41,15 @@
 	#define DMLIB_API
 #endif
 
-#if defined(__clang__)
+#ifdef __clang__
 	#pragma clang diagnostic push
 	// identifier '_TASKDIALOGCONFIG' is reserved because it starts with '_' followed by a capital letter
 	#pragma clang diagnostic ignored "-Wreserved-identifier"
 #endif
 
-typedef struct _TASKDIALOGCONFIG TASKDIALOGCONFIG; // forward declaration, from <CommCtrl.h>
+typedef struct _TASKDIALOGCONFIG TASKDIALOGCONFIG; // NOLINT // forward declaration, from <CommCtrl.h>
 
-#if defined(__clang__)
+#ifdef __clang__
 	#pragma clang diagnostic pop
 #endif
 /**

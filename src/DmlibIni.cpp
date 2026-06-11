@@ -25,7 +25,7 @@
 
 #include "DmlibColor.h"
 
-#if defined(__clang__)
+#ifdef __clang__
 	#pragma clang diagnostic push
 	#pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call" // function 'wcsrchr' is unsafe
 #endif
@@ -142,6 +142,6 @@ bool dmlib_ini::setClrFromIni(
 	return true;
 }
 
-#if defined(__clang__)
+#ifdef __clang__
 	#pragma clang diagnostic pop
 #endif

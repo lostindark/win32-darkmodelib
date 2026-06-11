@@ -180,7 +180,7 @@ namespace dmlib_color
 
 	inline COLORREF setNewColor(COLORREF& clrOld, COLORREF clrNew) noexcept
 	{
-		const auto clrTmp = COLORREF{ clrOld };
+		const auto clrTmp = clrOld ;
 		clrOld = clrNew;
 		return clrTmp;
 	}
@@ -518,7 +518,7 @@ namespace dmlib_color
 			return m_colors;
 		}
 
-#if !defined(_DARKMODELIB_NO_INI_CONFIG)
+#ifndef _DARKMODELIB_NO_INI_CONFIG
 		[[nodiscard]] dmlib::Colors& getToSetColors() noexcept
 		{
 			return m_colors;
@@ -633,7 +633,7 @@ namespace dmlib_color
 			return m_clrView;
 		}
 
-#if !defined(_DARKMODELIB_NO_INI_CONFIG)
+#ifndef _DARKMODELIB_NO_INI_CONFIG
 		[[nodiscard]] dmlib::ColorsView& getToSetColors() noexcept
 		{
 			return m_clrView;

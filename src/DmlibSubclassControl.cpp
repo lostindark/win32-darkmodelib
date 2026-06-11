@@ -35,7 +35,7 @@
 #include "DmlibPaintHelper.h"
 #include "DmlibSubclass.h"
 
-#if defined(__GNUC__)
+#ifdef __GNUC__
 static constexpr int CP_DROPDOWNITEM = 9; // for some reason mingw use only enum up to 8
 #endif
 
@@ -1106,7 +1106,7 @@ static void paintUpDown(
 	RECT rcTmp{ upDownData.m_rcClient };
 	if (!upDownData.m_isHorizontal)
 	{
-		rcTmp.left += upDownData.kOffset;
+		rcTmp.left += dmlib_subclass::UpDownData::kOffset;
 	}
 
 	HDC hdcFrom = nullptr;
@@ -1203,28 +1203,28 @@ LRESULT CALLBACK dmlib_subclass::UpDownSubclass(
 			::GetClientRect(hWnd, &rcClient);
 			pUpDownData->updateRect(rcClient);
 
-			if (!dmlib_paint::isAnimationEnabled())
-			{
-				if (!dmlib_paint::isRectValid(ps.rcPaint))
-				{
-					::EndPaint(hWnd, &ps);
-					return 0;
-				}
-
-				if (!pUpDownData->m_isHorizontal)
-				{
-					::OffsetRect(&ps.rcPaint, pUpDownData->kOffset, 0);
-					::OffsetRect(&rcClient, pUpDownData->kOffset, 0);
-				}
-
-				dmlib_paint::PaintWithBuffer<UpDownData>(*pUpDownData, hdc, ps,
-					[&]() noexcept { paintUpDown(hWnd, hMemDC, *pUpDownData); },
-					rcClient);
-			}
-			else
+			if (dmlib_paint::isAnimationEnabled())
 			{
 				paintUpDown(hWnd, hdc, *pUpDownData);
+				::EndPaint(hWnd, &ps);
+				return 0;
 			}
+
+			if (!dmlib_paint::isRectValid(ps.rcPaint))
+			{
+				::EndPaint(hWnd, &ps);
+				return 0;
+			}
+
+			if (!pUpDownData->m_isHorizontal)
+			{
+				::OffsetRect(&ps.rcPaint, UpDownData::kOffset, 0);
+				::OffsetRect(&rcClient, UpDownData::kOffset, 0);
+			}
+
+			dmlib_paint::PaintWithBuffer<UpDownData>(*pUpDownData, hdc, ps,
+				[&]() noexcept { paintUpDown(hWnd, hMemDC, *pUpDownData); },
+				rcClient);
 
 			::EndPaint(hWnd, &ps);
 			return 0;

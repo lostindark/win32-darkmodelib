@@ -20,7 +20,9 @@
 #include <cstdint>
 #include <cstring>
 
-#if defined(_MSC_VER)
+// NOLINTBEGIN(cppcoreguidelines-*)
+
+#ifdef _MSC_VER
 	# pragma warning(push)
 	# pragma warning(disable: 26429) // Symbol is never tested for nullness.
 	# pragma warning(disable: 26472) // Don't use a static_cast for arithmetic conversions.
@@ -131,8 +133,10 @@ namespace iat_hook
 	}
 } // namespace iat_hook
 
-#if defined(_MSC_VER)
+#ifdef _MSC_VER
 # pragma warning(pop)
 #elif defined(__clang__)
 #pragma clang diagnostic pop
 #endif
+
+// NOLINTEND(cppcoreguidelines-*)

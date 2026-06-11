@@ -496,12 +496,12 @@ static void prepaintListViewItem(LPNMLVCUSTOMDRAW& lplvcd, bool isReport, bool h
 
 			for (int i = 1; i < nCol; ++i)
 			{
-#if defined(__clang__)
+#ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wcast-qual" // cast from 'const type *' to 'type *' drops const
 #endif
 				ListView_GetItemIndexRect(hList, &lvii, i, LVIR_BOUNDS, &rcSubitem);
-#if defined(__clang__)
+#ifdef __clang__
 #pragma clang diagnostic pop
 #endif
 				rcSubitem.left -= paddingLeft;
