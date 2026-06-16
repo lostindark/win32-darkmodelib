@@ -137,9 +137,8 @@ static void renderButton(
 	RECT rcClient{};
 	::GetClientRect(hWnd, &rcClient);
 
-	std::wstring buffer;
 	const auto bufferLen = static_cast<size_t>(::GetWindowTextLengthW(hWnd));
-	buffer.resize(bufferLen + 1, L'\0');
+	auto buffer = std::wstring(bufferLen + 1, L'\0');
 	::GetWindowTextW(hWnd, buffer.data(), static_cast<int>(buffer.length()));
 
 	SIZE szBox{};
@@ -414,7 +413,9 @@ LRESULT CALLBACK dmlib_subclass::ButtonSubclass(
 			themeData.closeTheme();
 			if (pButtonData->m_isSizeSet)
 			{
-				if (SIZE szBtn{};
+				// szBtn is changed in Button_GetIdealSize so const should not be used,
+				// but it is used to silence C26496 - The variable 'szBtn' is assigned only once, mark it as const.
+				if (const SIZE szBtn{};
 					Button_GetIdealSize(hWnd, &szBtn) == TRUE)
 				{
 					const UINT dpi = dmlib_dpi::GetDpiForParent(hWnd);

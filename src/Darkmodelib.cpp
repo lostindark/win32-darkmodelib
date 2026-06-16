@@ -270,6 +270,7 @@ COLORREF dmlib::setLinkTextColor(COLORREF clrNew)           { return getTheme().
 COLORREF dmlib::setEdgeColor(COLORREF clrNew)               { return getTheme().setColorEdge(clrNew); }
 COLORREF dmlib::setHotEdgeColor(COLORREF clrNew)            { return getTheme().setColorHotEdge(clrNew); }
 COLORREF dmlib::setDisabledEdgeColor(COLORREF clrNew)       { return getTheme().setColorDisabledEdge(clrNew); }
+COLORREF dmlib::setHighlightColor(COLORREF clrNew)          { return getTheme().setColorHighlight(clrNew); }
 
 void dmlib::setThemeColors(const Colors* colors)
 {
@@ -4128,11 +4129,11 @@ static HRESULT CALLBACK DarkTaskDlgMsgBoxCallback(
  *                          This parameter can be a allowed combination of the following flags:
  *                          - MB_OK
  *                          - MB_OKCANCEL
- *                          - MB_ABORTRETRYIGNORE - buttons use only English loacalization
+ *                          - MB_ABORTRETRYIGNORE
  *                          - MB_YESNOCANCEL
  *                          - MB_YESNO
  *                          - MB_RETRYCANCEL
- *                          - MB_CANCELTRYCONTINUE - buttons use only English loacalization
+ *                          - MB_CANCELTRYCONTINUE
  *
  *                          - MB_DEFBUTTON1
  *                          - MB_DEFBUTTON2
@@ -4178,10 +4179,12 @@ static TASKDIALOGCONFIG msgBoxParamToTaskDlgConfig(HWND hWnd, LPCWSTR lpText, LP
 	tdc.pfCallback = DarkTaskDlgMsgBoxCallback;
 	tdc.lpCallbackData = static_cast<LONG_PTR>(uType);
 
+	dmlib_win32api::InitMB_GetString();
+
 	// buttons
 
-	static const UINT btnDefMask = uType | MB_DEFMASK;
-	auto getDefBtn = [](std::array<int, 3> btnIDs)
+	const UINT btnDefMask = uType & MB_DEFMASK;
+	auto getDefBtn = [&btnDefMask](std::array<int, 3> btnIDs)
 	{
 		if (btnDefMask == MB_DEFBUTTON2)
 		{
@@ -4211,10 +4214,10 @@ static TASKDIALOGCONFIG msgBoxParamToTaskDlgConfig(HWND hWnd, LPCWSTR lpText, LP
 
 		case MB_ABORTRETRYIGNORE:
 		{
-			static constexpr std::array<TASKDIALOG_BUTTON, 3> buttons{ {
-				{ IDABORT, L"&Abort" },
-				{ IDRETRY, L"&Retry" },
-				{ IDIGNORE, L"&Ignore" }
+			static const std::array<TASKDIALOG_BUTTON, 3> buttons{ {
+				{ IDABORT, dmlib_win32api::MB_GetString(IDABORT) },
+				{ IDRETRY, dmlib_win32api::MB_GetString(IDRETRY) },
+				{ IDIGNORE, dmlib_win32api::MB_GetString(IDIGNORE) }
 			} };
 
 			tdc.cButtons = static_cast<UINT>(buttons.size());
@@ -4247,10 +4250,10 @@ static TASKDIALOGCONFIG msgBoxParamToTaskDlgConfig(HWND hWnd, LPCWSTR lpText, LP
 
 		case MB_CANCELTRYCONTINUE:
 		{
-			static constexpr std::array<TASKDIALOG_BUTTON, 3> buttons{ {
-				{ IDABORT, L"&Abort" },
-				{ IDTRYAGAIN, L"&Try Again" },
-				{ IDCONTINUE, L"&Continue" }
+			static const std::array<TASKDIALOG_BUTTON, 3> buttons{ {
+				{ IDCANCEL, dmlib_win32api::MB_GetString(IDCANCEL) },
+				{ IDTRYAGAIN, dmlib_win32api::MB_GetString(IDTRYAGAIN) },
+				{ IDCONTINUE, dmlib_win32api::MB_GetString(IDCONTINUE) }
 			} };
 
 			tdc.cButtons = static_cast<UINT>(buttons.size());
@@ -4313,7 +4316,7 @@ static TASKDIALOGCONFIG msgBoxParamToTaskDlgConfig(HWND hWnd, LPCWSTR lpText, LP
 /**
  * @brief Displays a message box as task dialog with themed styling.
  *
- * Shows a custom task dialog instead of classic message box if @ref dmlib::isEnabled is true.
+ * Shows a custom task dialog instead of classic message box if @ref dmlib::isExperimentalActive is true.
  * Otherwise, it falls back to the standard Windows message box function.
  * The message box can present various buttons and icons based on the
  * specified parameters.
@@ -4324,20 +4327,20 @@ static TASKDIALOGCONFIG msgBoxParamToTaskDlgConfig(HWND hWnd, LPCWSTR lpText, LP
  * @param[in]   lpCaption   Text to be displayed in the title bar of the message box.
  * @param[in]   uType       Specifies the contents and behavior of the message box.
  *
- * @return HRESULT The returned value indicates which button was pressed by the user.
- *                 Or 0 zero if the function has failed.
+ * @return int The returned value indicates which button was pressed by the user.
+ *             Or 0 zero if the function has failed.
  *
  * @see DarkTaskDlgMsgBoxCallback()
  * @see msgBoxParamToTaskDlgConfig()
  */
-HRESULT dmlib::darkMessageBoxW(
+int dmlib::darkMessageBoxW(
 	HWND hWnd,
 	LPCWSTR lpText,
 	LPCWSTR lpCaption,
 	UINT uType
 )
 {
-	if (!dmlib::isEnabled())
+	if (!dmlib::isExperimentalActive())
 	{
 		return ::MessageBoxW(hWnd, lpText, lpCaption, uType);
 	}

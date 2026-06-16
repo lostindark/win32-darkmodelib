@@ -324,6 +324,7 @@ namespace dmlib
 	DMLIB_API COLORREF setEdgeColor(COLORREF clrNew);
 	DMLIB_API COLORREF setHotEdgeColor(COLORREF clrNew);
 	DMLIB_API COLORREF setDisabledEdgeColor(COLORREF clrNew);
+	DMLIB_API COLORREF setHighlightColor(COLORREF clrNew);
 
 	DMLIB_API void setThemeColors(const Colors* colors);
 	DMLIB_API void updateThemeBrushesAndPens();
@@ -772,7 +773,7 @@ namespace dmlib
 	DMLIB_API HRESULT darkTaskDialogIndirect(const TASKDIALOGCONFIG* pTaskConfig, int* pnButton, int* pnRadioButton, BOOL* pfVerificationFlagChecked);
 
 	/// Displays a message box as task dialog with themed styling.
-	DMLIB_API HRESULT darkMessageBoxW(HWND hWnd, LPCWSTR lpText, LPCWSTR lpCaption, UINT uType);
+	DMLIB_API int darkMessageBoxW(HWND hWnd, LPCWSTR lpText, LPCWSTR lpCaption, UINT uType);
 
 #ifdef __cplusplus
 	} // extern "C"

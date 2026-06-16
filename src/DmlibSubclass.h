@@ -186,7 +186,7 @@ namespace dmlib_subclass
 
 		explicit ThemeData(std::wstring_view themeClass) noexcept
 		{
-			const size_t copyLength = std::min(themeClass.size(), m_themeClass.size() - 1);
+			const size_t copyLength = std::min(themeClass.length(), m_themeClass.size() - 1);
 			std::copy_n(themeClass.begin(), copyLength, m_themeClass.begin());
 		}
 

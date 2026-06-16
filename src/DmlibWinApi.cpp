@@ -211,12 +211,9 @@ void dmlib_win32api::RefreshTitleBarThemeColor(HWND hWnd)
  */
 bool dmlib_win32api::IsColorSchemeChangeMessage(LPARAM lParam) noexcept
 {
-	bool isMsg = false;
-	if ((lParam != 0) // NULL
-		&& (_wcsicmp(reinterpret_cast<LPCWSTR>(lParam), L"ImmersiveColorSet") == 0))
-	{
-		isMsg = true;
-	}
+	const bool isMsg =
+		(lParam != 0) // NULL
+		&& (_wcsicmp(reinterpret_cast<LPCWSTR>(lParam), L"ImmersiveColorSet") == 0);
 
 	if (isMsg)
 	{
@@ -301,7 +298,14 @@ bool dmlib_win32api::IsWindows11() noexcept
 	return (g_buildNumber >= g_win11Build);
 }
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 26497) // This function function-name could be marked constexpr if compile-time evaluation is desired (f.4). // Used only in runtime.
+#endif
 [[nodiscard]] static bool CheckBuildNumber(DWORD buildNumber) noexcept
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 {
 #if defined(_DARKMODELIB_ALLOW_OLD_OS) && (_DARKMODELIB_ALLOW_OLD_OS > 0)
 	static constexpr size_t nWin10Builds = 8;
@@ -368,9 +372,14 @@ void dmlib_win32api::InitDarkMode() noexcept
 	{
 		return;
 	}
-
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 26429) // Symbol is never tested for nullness, it can be marked as not_null. // Already checked in dmlib_module::LoadFn.
+#endif
 	fnRtlGetNtVersionNumbers RtlGetNtVersionNumbers = nullptr;
-	
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 	if (HMODULE hNtdll = ::GetModuleHandleW(L"ntdll.dll");
 		hNtdll == nullptr
 		|| !dmlib_module::LoadFn(hNtdll, RtlGetNtVersionNumbers, "RtlGetNtVersionNumbers"))
@@ -457,5 +466,113 @@ void dmlib_win32api::SetDarkMode(bool useDark, [[maybe_unused]] bool applyScroll
 		}
 #endif
 		g_darkModeActive = useDark && !dmlib_win32api::IsHighContrast();
+	}
+}
+
+static LPCWSTR WINAPI DummyMB_GetString([[maybe_unused]] UINT wBtn) noexcept
+{
+	return nullptr;
+}
+
+using fnMB_GetString = auto (WINAPI*)(UINT) -> LPCWSTR;
+static fnMB_GetString pfMB_GetString = DummyMB_GetString;
+
+/**
+ * @brief Initializes undocumented MB_GetString.
+ */
+void dmlib_win32api::InitMB_GetString() noexcept
+{
+	static bool isInit = false;
+	if (isInit)
+	{
+		return;
+	}
+
+	if (HMODULE hUser32 = ::GetModuleHandleW(L"user32.dll");
+		hUser32 != nullptr)
+	{
+		dmlib_module::LoadFn(hUser32, pfMB_GetString, "MB_GetString");
+		isInit = true;
+	}
+}
+
+/**
+ * @brief Returns strings for standard message box buttons.
+ *
+ * @param[in] wBtn The id of the string to return.
+ *                 These are identified by the Dialog Box Command ID values listed in winuser.h.
+ *                 https://learn.microsoft.com/en-us/windows/win32/dlgbox/mb-getstring
+ *
+ * @return LPCWSTR The string, or nullptr if not found.
+ */
+LPCWSTR dmlib_win32api::MB_GetString(UINT wBtn) noexcept
+{
+	if (auto str = pfMB_GetString(wBtn - 1);
+		str != nullptr)
+	{
+		return str;
+	}
+
+	switch (wBtn)
+	{
+		case IDOK:
+		{
+			return L"OK";
+		}
+
+		case IDCANCEL:
+		{
+			return L"Cancel";
+		}
+
+		case IDABORT:
+		{
+			return L"&Abort";
+		}
+
+		case IDRETRY:
+		{
+			return L"&Retry";
+		}
+
+		case IDIGNORE:
+		{
+			return L"&Ignore";
+		}
+
+		case IDYES:
+		{
+			return L"&Yes";
+		}
+
+		case IDNO:
+		{
+			return L"&No";
+		}
+
+		case IDCLOSE:
+		{
+			return L"&Close";
+		}
+
+		case IDHELP:
+		{
+			return L"Help";
+		}
+
+		case IDTRYAGAIN:
+		{
+			return L"&Try Again";
+		}
+
+		case IDCONTINUE:
+		{
+			return L"&Continue";
+		}
+
+		default:
+		{
+			return nullptr;
+		}
 	}
 }

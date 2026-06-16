@@ -37,6 +37,7 @@ EXPORTS
 	setEdgeColor
 	setHotEdgeColor
 	setDisabledEdgeColor
+	setHighlightColor
 	setThemeColors
 	updateThemeBrushesAndPens
 	getBackgroundColor

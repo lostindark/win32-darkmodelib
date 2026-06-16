@@ -209,6 +209,7 @@ namespace dmlib
 	inline COLORREF DummySetEdgeColor(COLORREF) { return CLR_INVALID; }
 	inline COLORREF DummySetHotEdgeColor(COLORREF) { return CLR_INVALID; }
 	inline COLORREF DummySetDisabledEdgeColor(COLORREF) { return CLR_INVALID; }
+	inline COLORREF DummySetHighlightColor(COLORREF) { return CLR_INVALID; }
 
 	inline void DummySetThemeColors(Colors) {}
 	inline void DummyUpdateThemeBrushesAndPens() {}
@@ -227,6 +228,7 @@ namespace dmlib
 	[[nodiscard]] inline COLORREF DummyGetEdgeColor() { return CLR_INVALID; }
 	[[nodiscard]] inline COLORREF DummyGetHotEdgeColor() { return CLR_INVALID; }
 	[[nodiscard]] inline COLORREF DummyGetDisabledEdgeColor() { return CLR_INVALID; }
+	[[nodiscard]] inline COLORREF DummyGetHighlightColor() { return CLR_INVALID; }
 
 	[[nodiscard]] inline HBRUSH DummyGetBackgroundBrush() { return nullptr; }
 	[[nodiscard]] inline HBRUSH DummyGetDlgBackgroundBrush() { return nullptr; }
@@ -237,13 +239,13 @@ namespace dmlib
 	[[nodiscard]] inline HBRUSH DummyGetEdgeBrush() { return nullptr; }
 	[[nodiscard]] inline HBRUSH DummyGetHotEdgeBrush() { return nullptr; }
 	[[nodiscard]] inline HBRUSH DummyGetDisabledEdgeBrush() { return nullptr; }
-	[[nodiscard]] inline HBRUSH DummyGetHighlightEdgeBrush() { return nullptr; }
+	[[nodiscard]] inline HBRUSH DummyGetHighlightBrush() { return nullptr; }
 
 	[[nodiscard]] inline HPEN DummyGetDarkerTextPen() { return nullptr; }
 	[[nodiscard]] inline HPEN DummyGetEdgePen() { return nullptr; }
 	[[nodiscard]] inline HPEN DummyGetHotEdgePen() { return nullptr; }
 	[[nodiscard]] inline HPEN DummyGetDisabledEdgePen() { return nullptr; }
-	[[nodiscard]] inline HPEN DummyGetHighlightEdgePen() { return nullptr; }
+	[[nodiscard]] inline HPEN DummyGetHighlightPen() { return nullptr; }
 
 	inline COLORREF DummySetViewBackgroundColor(COLORREF) { return CLR_INVALID; }
 	inline COLORREF DummySetViewTextColor(COLORREF) { return CLR_INVALID; }
@@ -408,6 +410,7 @@ namespace dmlib
 	inline void DummySetDarkTaskDlg(HWND) {}
 	inline HRESULT CALLBACK DummyDarkTaskDlgCallback(HWND, UINT, WPARAM, LPARAM, LONG_PTR) { return S_OK; }
 	inline HRESULT DummyDarkTaskDialogIndirect(const TASKDIALOGCONFIG*, int*, int*, BOOL*) { return S_OK; }
+	inline int DummyDarkMessageBoxW(HWND , LPCWSTR , LPCWSTR , UINT ) { return 0; }
 
 	using fnGetLibInfo = auto (*)(int libInfoType) -> int;
 	inline fnGetLibInfo getLibInfo = nullptr;
@@ -519,6 +522,9 @@ namespace dmlib
 
 	using fnSetDisabledEdgeColor = auto (*)(COLORREF clrNew) -> COLORREF;
 	inline fnSetDisabledEdgeColor setDisabledEdgeColor = nullptr;
+
+	using fnSetHighlightColor = auto (*)(COLORREF clrNew) -> COLORREF;
+	inline fnSetHighlightColor setHighlightColor = nullptr;
 
 	using fnSetThemeColors = void (*)(Colors colors);
 	inline fnSetThemeColors setThemeColors = nullptr;
@@ -951,6 +957,9 @@ namespace dmlib
 
 	using fnDarkTaskDialogIndirect = auto (*)(const TASKDIALOGCONFIG* pTaskConfig, int* pnButton, int* pnRadioButton, BOOL* pfVerificationFlagChecked) -> HRESULT;
 	inline fnDarkTaskDialogIndirect darkTaskDialogIndirect = nullptr;
+
+	using fnDarkMessageBoxW = auto (*)(HWND hWnd, LPCWSTR lpText, LPCWSTR lpCaption, UINT uType) -> int;
+	inline fnDarkMessageBoxW darkMessageBoxW = nullptr;
 
 	bool loadDarkModeFunctionsFromDll(const wchar_t* dllName);
 }

@@ -109,7 +109,7 @@ bool dmlib_ini::setClrFromIni(
 		, keyName.c_str()
 		, L""
 		, buffer.data()
-		, static_cast<DWORD>(buffer.size())
+		, static_cast<DWORD>(buffer.length())
 		, iniFilePath.c_str());
 
 	if (len != maxStrLen)
