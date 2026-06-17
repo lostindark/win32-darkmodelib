@@ -23,15 +23,10 @@
 #include <cstdint>
 #include <utility>
 
-#if defined(_DARKMODELIB_USE_SCROLLBAR_FIX) && (_DARKMODELIB_USE_SCROLLBAR_FIX > 0)
-#include <mutex>
-#include <string_view>
-#include <unordered_set>
-#endif
-
 #include "ModuleHelper.h"
 
 #include "IatHook.h"
+#include "DmlibSubclass.h"
 
 namespace dmlib_win32api
 {
@@ -175,9 +170,44 @@ bool dmlib_hook::loadOpenNcThemeData(const HMODULE& hUxtheme) noexcept
 }
 
 #if defined(_DARKMODELIB_USE_SCROLLBAR_FIX) && (_DARKMODELIB_USE_SCROLLBAR_FIX > 1)
-// limit dark scroll bar to specific windows and their children
-static std::unordered_set<HWND> g_darkScrollBarWindows;
-static std::mutex g_darkScrollBarMutex;
+static constexpr LPCWSTR kDarkScrollBarWindowProp = L"DarkModeLibDarkScrollBar";
+
+static LRESULT CALLBACK DarkScrollBarPropSubclass(
+	HWND hWnd,
+	UINT uMsg,
+	WPARAM wParam,
+	LPARAM lParam,
+	UINT_PTR uIdSubclass,
+	[[maybe_unused]] DWORD_PTR dwRefData
+) noexcept
+{
+	if (uMsg == WM_NCDESTROY)
+	{
+		::RemovePropW(hWnd, kDarkScrollBarWindowProp);
+		::RemoveWindowSubclass(hWnd, DarkScrollBarPropSubclass, uIdSubclass);
+	}
+	return ::DefSubclassProc(hWnd, uMsg, wParam, lParam);
+}
+
+static bool isWindowOrParentUsingDarkScrollBar(HWND hWnd)
+{
+	for (HWND hWndToCheck = hWnd; hWndToCheck != nullptr;)
+	{
+		if (::GetPropW(hWndToCheck, kDarkScrollBarWindowProp) != nullptr)
+		{
+			return true;
+		}
+
+		const HWND hParent = ::GetAncestor(hWndToCheck, GA_PARENT);
+		if (hParent == hWndToCheck)
+		{
+			break;
+		}
+		hWndToCheck = hParent;
+	}
+	return false;
+}
+#endif // defined(_DARKMODELIB_USE_SCROLLBAR_FIX) && (_DARKMODELIB_USE_SCROLLBAR_FIX > 1)
 
 /**
  * @brief Makes scroll bars on the specified window and all its children consistent.
@@ -191,38 +221,29 @@ static std::mutex g_darkScrollBarMutex;
  * @see dmlib::setDarkExplorerTheme()
  * @see dmlib::setDarkThemeExperimental()
  */
-void dmlib_hook::enableDarkScrollBarForWindowAndChildren(HWND hWnd)
+void dmlib_hook::enableDarkScrollBarForWindowAndChildren([[maybe_unused]] HWND hWnd)
 {
-	const std::lock_guard<std::mutex> lock(g_darkScrollBarMutex);
-	g_darkScrollBarWindows.insert(hWnd);
-}
-
-static bool isWindowOrParentUsingDarkScrollBar(HWND hWnd)
-{
-	HWND hRoot = ::GetAncestor(hWnd, GA_ROOT);
-
-	const std::lock_guard<std::mutex> lock(g_darkScrollBarMutex);
-	auto hasElement = [](const auto& container, HWND hWndToCheck) -> bool
+#if defined(_DARKMODELIB_USE_SCROLLBAR_FIX) && (_DARKMODELIB_USE_SCROLLBAR_FIX > 1)
+	if (::IsWindow(hWnd) == FALSE)
 	{
-#if (defined(_MSC_VER) && (_MSVC_LANG >= 202002L)) || (__cplusplus >= 202002L)
-		return container.contains(hWndToCheck);
-#else
-		return container.count(hWndToCheck) != 0;
-#endif
-	};
-
-	if (hasElement(g_darkScrollBarWindows, hWnd))
-	{
-		return true;
+		return;
 	}
-	return (hWnd != hRoot && hasElement(g_darkScrollBarWindows, hRoot));
+
+	if (::SetPropW(hWnd, kDarkScrollBarWindowProp, reinterpret_cast<HANDLE>(static_cast<INT_PTR>(TRUE))) == FALSE)
+	{
+		return;
+	}
+
+	if (dmlib_subclass::SetSubclass(hWnd, DarkScrollBarPropSubclass, dmlib_subclass::SubclassID::darkScrollBar) == FALSE)
+	{
+		::RemovePropW(hWnd, kDarkScrollBarWindowProp);
+	}
+#endif
 }
-#endif // defined(_DARKMODELIB_USE_SCROLLBAR_FIX) && (_DARKMODELIB_USE_SCROLLBAR_FIX > 1)
 
 static HTHEME WINAPI MyOpenNcThemeData(HWND hWnd, LPCWSTR pszClassList)
 {
-	static constexpr std::wstring_view scrollBarClassName = WC_SCROLLBAR;
-	if (scrollBarClassName == pszClassList)
+	if (pszClassList != nullptr && ::lstrcmpW(pszClassList, WC_SCROLLBAR) == 0)
 	{
 #if defined(_DARKMODELIB_USE_SCROLLBAR_FIX) && (_DARKMODELIB_USE_SCROLLBAR_FIX > 1)
 		if (isWindowOrParentUsingDarkScrollBar(hWnd))

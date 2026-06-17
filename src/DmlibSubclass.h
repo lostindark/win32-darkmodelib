@@ -51,7 +51,8 @@ namespace dmlib_subclass
 		windowNotify,
 		windowMenuBar,
 		windowSettingChange,
-		taskDlg
+		taskDlg,
+		darkScrollBar
 	};
 
 	/**
