@@ -63,8 +63,7 @@ CXXWARNFLAGS = 	-Wall \
 				-Woverloaded-virtual \
 				-Wsign-conversion \
 				-Wuninitialized \
-				-Wunused \
-				-Wno-cast-function-type
+				-Wunused
 
 # Warning flags for the demo
 DEMO_WARNFLAGS := -Wall \

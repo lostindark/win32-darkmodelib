@@ -14,6 +14,12 @@
 
 #include <windows.h>
 
+#if (defined(_MSC_VER) && (_MSVC_LANG >= 202002L)) || (__cplusplus >= 202002L)
+#include <bit>
+#else
+#include <cstring>
+#endif
+
 #include <cwchar>
 
 #if defined(_MSC_VER)
@@ -27,9 +33,15 @@ namespace dmlib_module
 	template <typename P>
 	inline auto LoadFn(HMODULE handle, P& pointer, const char* name) noexcept -> bool
 	{
-		if (auto proc = ::GetProcAddress(handle, name); proc != nullptr)
+		if (auto proc = ::GetProcAddress(handle, name);
+			proc != nullptr)
 		{
-			pointer = reinterpret_cast<P>(reinterpret_cast<INT_PTR>(proc));
+#if (defined(_MSC_VER) && (_MSVC_LANG >= 202002L)) || (__cplusplus >= 202002L)
+			pointer = std::bit_cast<P>(proc);
+#else
+			static_assert(sizeof(P) == sizeof(proc));
+			std::memcpy(&pointer, &proc, sizeof(P));
+#endif
 			return true;
 		}
 		return false;
@@ -165,252 +177,255 @@ namespace dmlib
 		classic = 3 ///< Classic (non-themed or system) appearance.
 	};
 
-	[[nodiscard]] inline int DummyGetLibInfo(int) { return -1; }
+	extern "C"
+	{
+		[[nodiscard]] inline int DummyGetLibInfo(int) { return -1; }
 
-	inline void DummyInitDarkModeConfig(UINT) {}
-	inline void DummySetRoundCornerConfig(UINT) {}
-	inline void DummySetBorderColorConfig(COLORREF) {}
-	inline void DummySetMicaConfig(UINT) {}
-	inline void DummySetMicaExtendedConfig(bool) {}
-	inline void DummySetColorizeTitleBarConfig(bool) {}
-	inline void DummySetDarkModeConfigEx(UINT) {}
-	inline void DummySetDarkModeConfig() {}
-	inline void DummyInitDarkModeEx(const wchar_t*) {}
-	inline void DummyInitDarkMode() {}
-	[[nodiscard]] inline bool DummyDoesConfigFileExist() { return false; }
+		inline void DummyInitDarkModeConfig(UINT) {}
+		inline void DummySetRoundCornerConfig(UINT) {}
+		inline void DummySetBorderColorConfig(COLORREF) {}
+		inline void DummySetMicaConfig(UINT) {}
+		inline void DummySetMicaExtendedConfig(bool) {}
+		inline void DummySetColorizeTitleBarConfig(bool) {}
+		inline void DummySetDarkModeConfigEx(UINT) {}
+		inline void DummySetDarkModeConfig() {}
+		inline void DummyInitDarkModeEx(const wchar_t*) {}
+		inline void DummyInitDarkMode() {}
+		[[nodiscard]] inline bool DummyDoesConfigFileExist() { return false; }
 
-	[[nodiscard]] inline bool DummyIsEnabled() { return false; }
-	[[nodiscard]] inline bool DummyIsExperimentalActive() { return false; }
-	[[nodiscard]] inline bool DummyIsExperimentalSupported() { return false; }
-	[[nodiscard]] inline bool DummyIsWindowsModeEnabled() { return false; }
-	[[nodiscard]] inline bool DummyIsAtLeastWindows10() { return false; }
-	[[nodiscard]] inline bool DummyIsAtLeastWindows11() { return false; }
+		[[nodiscard]] inline bool DummyIsEnabled() { return false; }
+		[[nodiscard]] inline bool DummyIsExperimentalActive() { return false; }
+		[[nodiscard]] inline bool DummyIsExperimentalSupported() { return false; }
+		[[nodiscard]] inline bool DummyIsWindowsModeEnabled() { return false; }
+		[[nodiscard]] inline bool DummyIsAtLeastWindows10() { return false; }
+		[[nodiscard]] inline bool DummyIsAtLeastWindows11() { return false; }
 
-	[[nodiscard]] inline DWORD DummyGetWindowsBuildNumber() { return 0; }
+		[[nodiscard]] inline DWORD DummyGetWindowsBuildNumber() { return 0; }
 
-	inline bool DummyHandleSettingChange(LPARAM) { return false; }
-	[[nodiscard]] inline bool DummyIsDarkModeReg() { return false; }
+		inline bool DummyHandleSettingChange(LPARAM) { return false; }
+		[[nodiscard]] inline bool DummyIsDarkModeReg() { return false; }
 
-	inline void DummySetSysColor(int, COLORREF) {}
-	inline void DummyEnableDarkScrollBarForWindowAndChildren(HWND) {}
+		inline void DummySetSysColor(int, COLORREF) {}
+		inline void DummyEnableDarkScrollBarForWindowAndChildren(HWND) {}
 
-	inline void DummySetColorTone(int) {}
-	[[nodiscard]] inline int DummyGetColorTone() { return -1; }
+		inline void DummySetColorTone(int) {}
+		[[nodiscard]] inline int DummyGetColorTone() { return -1; }
 
-	inline COLORREF DummySetBackgroundColor(COLORREF) { return CLR_INVALID; }
-	inline COLORREF DummySetCtrlBackgroundColor(COLORREF) { return CLR_INVALID; }
-	inline COLORREF DummySetHotBackgroundColor(COLORREF) { return CLR_INVALID; }
-	inline COLORREF DummySetDlgBackgroundColor(COLORREF) { return CLR_INVALID; }
-	inline COLORREF DummySetErrorBackgroundColor(COLORREF) { return CLR_INVALID; }
-	inline COLORREF DummySetTextColor(COLORREF) { return CLR_INVALID; }
-	inline COLORREF DummySetDarkerTextColor(COLORREF) { return CLR_INVALID; }
-	inline COLORREF DummySetDisabledTextColor(COLORREF) { return CLR_INVALID; }
-	inline COLORREF DummySetLinkTextColor(COLORREF) { return CLR_INVALID; }
-	inline COLORREF DummySetEdgeColor(COLORREF) { return CLR_INVALID; }
-	inline COLORREF DummySetHotEdgeColor(COLORREF) { return CLR_INVALID; }
-	inline COLORREF DummySetDisabledEdgeColor(COLORREF) { return CLR_INVALID; }
-	inline COLORREF DummySetHighlightColor(COLORREF) { return CLR_INVALID; }
+		inline COLORREF DummySetBackgroundColor(COLORREF) { return CLR_INVALID; }
+		inline COLORREF DummySetCtrlBackgroundColor(COLORREF) { return CLR_INVALID; }
+		inline COLORREF DummySetHotBackgroundColor(COLORREF) { return CLR_INVALID; }
+		inline COLORREF DummySetDlgBackgroundColor(COLORREF) { return CLR_INVALID; }
+		inline COLORREF DummySetErrorBackgroundColor(COLORREF) { return CLR_INVALID; }
+		inline COLORREF DummySetTextColor(COLORREF) { return CLR_INVALID; }
+		inline COLORREF DummySetDarkerTextColor(COLORREF) { return CLR_INVALID; }
+		inline COLORREF DummySetDisabledTextColor(COLORREF) { return CLR_INVALID; }
+		inline COLORREF DummySetLinkTextColor(COLORREF) { return CLR_INVALID; }
+		inline COLORREF DummySetEdgeColor(COLORREF) { return CLR_INVALID; }
+		inline COLORREF DummySetHotEdgeColor(COLORREF) { return CLR_INVALID; }
+		inline COLORREF DummySetDisabledEdgeColor(COLORREF) { return CLR_INVALID; }
+		inline COLORREF DummySetHighlightColor(COLORREF) { return CLR_INVALID; }
 
-	inline void DummySetThemeColors(Colors) {}
-	inline void DummyUpdateThemeBrushesAndPens() {}
+		inline void DummySetThemeColors(Colors) {}
+		inline void DummyUpdateThemeBrushesAndPens() {}
 
-	[[nodiscard]] inline COLORREF DummyGetBackgroundColor() { return CLR_INVALID; }
-	[[nodiscard]] inline COLORREF DummyGetCtrlBackgroundColor() { return CLR_INVALID; }
-	[[nodiscard]] inline COLORREF DummyGetHotBackgroundColor() { return CLR_INVALID; }
-	[[nodiscard]] inline COLORREF DummyGetDlgBackgroundColor() { return CLR_INVALID; }
-	[[nodiscard]] inline COLORREF DummyGetErrorBackgroundColor() { return CLR_INVALID; }
+		[[nodiscard]] inline COLORREF DummyGetBackgroundColor() { return CLR_INVALID; }
+		[[nodiscard]] inline COLORREF DummyGetCtrlBackgroundColor() { return CLR_INVALID; }
+		[[nodiscard]] inline COLORREF DummyGetHotBackgroundColor() { return CLR_INVALID; }
+		[[nodiscard]] inline COLORREF DummyGetDlgBackgroundColor() { return CLR_INVALID; }
+		[[nodiscard]] inline COLORREF DummyGetErrorBackgroundColor() { return CLR_INVALID; }
 
-	[[nodiscard]] inline COLORREF DummyGetTextColor() { return CLR_INVALID; }
-	[[nodiscard]] inline COLORREF DummyGetDarkerTextColor() { return CLR_INVALID; }
-	[[nodiscard]] inline COLORREF DummyGetDisabledTextColor() { return CLR_INVALID; }
-	[[nodiscard]] inline COLORREF DummyGetLinkTextColor() { return CLR_INVALID; }
+		[[nodiscard]] inline COLORREF DummyGetTextColor() { return CLR_INVALID; }
+		[[nodiscard]] inline COLORREF DummyGetDarkerTextColor() { return CLR_INVALID; }
+		[[nodiscard]] inline COLORREF DummyGetDisabledTextColor() { return CLR_INVALID; }
+		[[nodiscard]] inline COLORREF DummyGetLinkTextColor() { return CLR_INVALID; }
 
-	[[nodiscard]] inline COLORREF DummyGetEdgeColor() { return CLR_INVALID; }
-	[[nodiscard]] inline COLORREF DummyGetHotEdgeColor() { return CLR_INVALID; }
-	[[nodiscard]] inline COLORREF DummyGetDisabledEdgeColor() { return CLR_INVALID; }
-	[[nodiscard]] inline COLORREF DummyGetHighlightColor() { return CLR_INVALID; }
+		[[nodiscard]] inline COLORREF DummyGetEdgeColor() { return CLR_INVALID; }
+		[[nodiscard]] inline COLORREF DummyGetHotEdgeColor() { return CLR_INVALID; }
+		[[nodiscard]] inline COLORREF DummyGetDisabledEdgeColor() { return CLR_INVALID; }
+		[[nodiscard]] inline COLORREF DummyGetHighlightColor() { return CLR_INVALID; }
 
-	[[nodiscard]] inline HBRUSH DummyGetBackgroundBrush() { return nullptr; }
-	[[nodiscard]] inline HBRUSH DummyGetDlgBackgroundBrush() { return nullptr; }
-	[[nodiscard]] inline HBRUSH DummyGetCtrlBackgroundBrush() { return nullptr; }
-	[[nodiscard]] inline HBRUSH DummyGetHotBackgroundBrush() { return nullptr; }
-	[[nodiscard]] inline HBRUSH DummyGetErrorBackgroundBrush() { return nullptr; }
+		[[nodiscard]] inline HBRUSH DummyGetBackgroundBrush() { return nullptr; }
+		[[nodiscard]] inline HBRUSH DummyGetDlgBackgroundBrush() { return nullptr; }
+		[[nodiscard]] inline HBRUSH DummyGetCtrlBackgroundBrush() { return nullptr; }
+		[[nodiscard]] inline HBRUSH DummyGetHotBackgroundBrush() { return nullptr; }
+		[[nodiscard]] inline HBRUSH DummyGetErrorBackgroundBrush() { return nullptr; }
 
-	[[nodiscard]] inline HBRUSH DummyGetEdgeBrush() { return nullptr; }
-	[[nodiscard]] inline HBRUSH DummyGetHotEdgeBrush() { return nullptr; }
-	[[nodiscard]] inline HBRUSH DummyGetDisabledEdgeBrush() { return nullptr; }
-	[[nodiscard]] inline HBRUSH DummyGetHighlightBrush() { return nullptr; }
+		[[nodiscard]] inline HBRUSH DummyGetEdgeBrush() { return nullptr; }
+		[[nodiscard]] inline HBRUSH DummyGetHotEdgeBrush() { return nullptr; }
+		[[nodiscard]] inline HBRUSH DummyGetDisabledEdgeBrush() { return nullptr; }
+		[[nodiscard]] inline HBRUSH DummyGetHighlightBrush() { return nullptr; }
 
-	[[nodiscard]] inline HPEN DummyGetDarkerTextPen() { return nullptr; }
-	[[nodiscard]] inline HPEN DummyGetEdgePen() { return nullptr; }
-	[[nodiscard]] inline HPEN DummyGetHotEdgePen() { return nullptr; }
-	[[nodiscard]] inline HPEN DummyGetDisabledEdgePen() { return nullptr; }
-	[[nodiscard]] inline HPEN DummyGetHighlightPen() { return nullptr; }
+		[[nodiscard]] inline HPEN DummyGetDarkerTextPen() { return nullptr; }
+		[[nodiscard]] inline HPEN DummyGetEdgePen() { return nullptr; }
+		[[nodiscard]] inline HPEN DummyGetHotEdgePen() { return nullptr; }
+		[[nodiscard]] inline HPEN DummyGetDisabledEdgePen() { return nullptr; }
+		[[nodiscard]] inline HPEN DummyGetHighlightPen() { return nullptr; }
 
-	inline COLORREF DummySetViewBackgroundColor(COLORREF) { return CLR_INVALID; }
-	inline COLORREF DummySetViewTextColor(COLORREF) { return CLR_INVALID; }
-	inline COLORREF DummySetViewGridlinesColor(COLORREF) { return CLR_INVALID; }
-	inline COLORREF DummySetHeaderBackgroundColor(COLORREF) { return CLR_INVALID; }
-	inline COLORREF DummySetHeaderHotBackgroundColor(COLORREF) { return CLR_INVALID; }
-	inline COLORREF DummySetHeaderTextColor(COLORREF) { return CLR_INVALID; }
-	inline COLORREF DummySetHeaderEdgeColor(COLORREF) { return CLR_INVALID; }
+		inline COLORREF DummySetViewBackgroundColor(COLORREF) { return CLR_INVALID; }
+		inline COLORREF DummySetViewTextColor(COLORREF) { return CLR_INVALID; }
+		inline COLORREF DummySetViewGridlinesColor(COLORREF) { return CLR_INVALID; }
+		inline COLORREF DummySetHeaderBackgroundColor(COLORREF) { return CLR_INVALID; }
+		inline COLORREF DummySetHeaderHotBackgroundColor(COLORREF) { return CLR_INVALID; }
+		inline COLORREF DummySetHeaderTextColor(COLORREF) { return CLR_INVALID; }
+		inline COLORREF DummySetHeaderEdgeColor(COLORREF) { return CLR_INVALID; }
 
-	inline void DummySetViewColors(ColorsView) {}
-	inline void DummyUpdateViewBrushesAndPens() {}
+		inline void DummySetViewColors(ColorsView) {}
+		inline void DummyUpdateViewBrushesAndPens() {}
 
-	[[nodiscard]] inline COLORREF DummyGetViewBackgroundColor() { return CLR_INVALID; }
-	[[nodiscard]] inline COLORREF DummyGetViewTextColor() { return CLR_INVALID; }
-	[[nodiscard]] inline COLORREF DummyGetViewGridlinesColor() { return CLR_INVALID; }
+		[[nodiscard]] inline COLORREF DummyGetViewBackgroundColor() { return CLR_INVALID; }
+		[[nodiscard]] inline COLORREF DummyGetViewTextColor() { return CLR_INVALID; }
+		[[nodiscard]] inline COLORREF DummyGetViewGridlinesColor() { return CLR_INVALID; }
 
-	[[nodiscard]] inline COLORREF DummyGetHeaderBackgroundColor() { return CLR_INVALID; }
-	[[nodiscard]] inline COLORREF DummyGetHeaderHotBackgroundColor() { return CLR_INVALID; }
-	[[nodiscard]] inline COLORREF DummyGetHeaderTextColor() { return CLR_INVALID; }
-	[[nodiscard]] inline COLORREF DummyGetHeaderEdgeColor() { return CLR_INVALID; }
+		[[nodiscard]] inline COLORREF DummyGetHeaderBackgroundColor() { return CLR_INVALID; }
+		[[nodiscard]] inline COLORREF DummyGetHeaderHotBackgroundColor() { return CLR_INVALID; }
+		[[nodiscard]] inline COLORREF DummyGetHeaderTextColor() { return CLR_INVALID; }
+		[[nodiscard]] inline COLORREF DummyGetHeaderEdgeColor() { return CLR_INVALID; }
 
-	[[nodiscard]] inline HBRUSH DummyGetViewBackgroundBrush() { return nullptr; }
-	[[nodiscard]] inline HBRUSH DummyGetViewGridlinesBrush() { return nullptr; }
+		[[nodiscard]] inline HBRUSH DummyGetViewBackgroundBrush() { return nullptr; }
+		[[nodiscard]] inline HBRUSH DummyGetViewGridlinesBrush() { return nullptr; }
 
-	[[nodiscard]] inline HBRUSH DummyGetHeaderBackgroundBrush() { return nullptr; }
-	[[nodiscard]] inline HBRUSH DummyGetHeaderHotBackgroundBrush() { return nullptr; }
+		[[nodiscard]] inline HBRUSH DummyGetHeaderBackgroundBrush() { return nullptr; }
+		[[nodiscard]] inline HBRUSH DummyGetHeaderHotBackgroundBrush() { return nullptr; }
 
-	[[nodiscard]] inline HPEN DummyGetHeaderEdgePen() { return nullptr; }
+		[[nodiscard]] inline HPEN DummyGetHeaderEdgePen() { return nullptr; }
 
-	inline void DummySetDefaultColors(bool) {}
+		inline void DummySetDefaultColors(bool) {}
 
-	inline void DummySetCheckboxOrRadioBtnCtrlSubclass(HWND) {}
-	inline void DummyRemoveCheckboxOrRadioBtnCtrlSubclass(HWND) {}
+		inline void DummySetCheckboxOrRadioBtnCtrlSubclass(HWND) {}
+		inline void DummyRemoveCheckboxOrRadioBtnCtrlSubclass(HWND) {}
 
-	inline void DummySetGroupboxCtrlSubclass(HWND) {}
-	inline void DummyRemoveGroupboxCtrlSubclass(HWND) {}
+		inline void DummySetGroupboxCtrlSubclass(HWND) {}
+		inline void DummyRemoveGroupboxCtrlSubclass(HWND) {}
 
-	inline void DummySetUpDownCtrlSubclass(HWND) {}
-	inline void DummyRemoveUpDownCtrlSubclass(HWND) {}
+		inline void DummySetUpDownCtrlSubclass(HWND) {}
+		inline void DummyRemoveUpDownCtrlSubclass(HWND) {}
 
-	inline void DummySetTabCtrlUpDownSubclass(HWND) {}
-	inline void DummyRemoveTabCtrlUpDownSubclass(HWND) {}
+		inline void DummySetTabCtrlUpDownSubclass(HWND) {}
+		inline void DummyRemoveTabCtrlUpDownSubclass(HWND) {}
 
-	inline void DummySetTabCtrlSubclass(HWND) {}
-	inline void DummyRemoveTabCtrlSubclass(HWND) {}
+		inline void DummySetTabCtrlSubclass(HWND) {}
+		inline void DummyRemoveTabCtrlSubclass(HWND) {}
 
-	inline void DummySetCustomBorderForListBoxOrEditCtrlSubclass(HWND) {}
-	inline void DummyRemoveCustomBorderForListBoxOrEditCtrlSubclass(HWND) {}
+		inline void DummySetCustomBorderForListBoxOrEditCtrlSubclass(HWND) {}
+		inline void DummyRemoveCustomBorderForListBoxOrEditCtrlSubclass(HWND) {}
 
-	inline void DummySetComboBoxCtrlSubclass(HWND) {}
-	inline void DummyRemoveComboBoxCtrlSubclass(HWND) {}
+		inline void DummySetComboBoxCtrlSubclass(HWND) {}
+		inline void DummyRemoveComboBoxCtrlSubclass(HWND) {}
 
-	inline void DummySetComboBoxExCtrlSubclass(HWND) {}
-	inline void DummyRemoveComboBoxExCtrlSubclass(HWND) {}
+		inline void DummySetComboBoxExCtrlSubclass(HWND) {}
+		inline void DummyRemoveComboBoxExCtrlSubclass(HWND) {}
 
-	inline void DummySetListViewCtrlSubclass(HWND) {}
-	inline void DummyRemoveListViewCtrlSubclass(HWND) {}
+		inline void DummySetListViewCtrlSubclass(HWND) {}
+		inline void DummyRemoveListViewCtrlSubclass(HWND) {}
 
-	inline void DummySetHeaderCtrlSubclass(HWND) {}
-	inline void DummyRemoveHeaderCtrlSubclass(HWND) {}
+		inline void DummySetHeaderCtrlSubclass(HWND) {}
+		inline void DummyRemoveHeaderCtrlSubclass(HWND) {}
 
-	inline void DummySetStatusBarCtrlSubclass(HWND) {}
-	inline void DummyRemoveStatusBarCtrlSubclass(HWND) {}
+		inline void DummySetStatusBarCtrlSubclass(HWND) {}
+		inline void DummyRemoveStatusBarCtrlSubclass(HWND) {}
 
-	inline void DummySetProgressBarCtrlSubclass(HWND) {}
-	inline void DummyRemoveProgressBarCtrlSubclass(HWND) {}
+		inline void DummySetProgressBarCtrlSubclass(HWND) {}
+		inline void DummyRemoveProgressBarCtrlSubclass(HWND) {}
 
-	inline void DummySetStaticTextCtrlSubclass(HWND) {}
-	inline void DummyRemoveStaticTextCtrlSubclass(HWND) {}
+		inline void DummySetStaticTextCtrlSubclass(HWND) {}
+		inline void DummyRemoveStaticTextCtrlSubclass(HWND) {}
 
-	inline void DummySetIPAddressCtrlSubclass(HWND) {}
-	inline void DummyRemoveIPAddressCtrlSubclass(HWND) {}
+		inline void DummySetIPAddressCtrlSubclass(HWND) {}
+		inline void DummyRemoveIPAddressCtrlSubclass(HWND) {}
 
-	inline void DummySetHotKeyCtrlSubclass(HWND) {}
-	inline void DummyRemoveHotKeyCtrlSubclass(HWND) {}
+		inline void DummySetHotKeyCtrlSubclass(HWND) {}
+		inline void DummyRemoveHotKeyCtrlSubclass(HWND) {}
 
-	inline void DummySetDTPCtrlSubclass(HWND) {}
-	inline void DummyRemoveDTPCtrlSubclass(HWND) {}
+		inline void DummySetDTPCtrlSubclass(HWND) {}
+		inline void DummyRemoveDTPCtrlSubclass(HWND) {}
 
-	inline void DummySetChildCtrlsSubclassAndThemeEx(HWND, bool, bool) {}
-	inline void DummySetChildCtrlsSubclassAndTheme(HWND) {}
-	inline void DummySetChildCtrlsTheme(HWND) {}
+		inline void DummySetChildCtrlsSubclassAndThemeEx(HWND, bool, bool) {}
+		inline void DummySetChildCtrlsSubclassAndTheme(HWND) {}
+		inline void DummySetChildCtrlsTheme(HWND) {}
 
-	inline void DummySetWindowEraseBgSubclass(HWND) {}
-	inline void DummyRemoveWindowEraseBgSubclass(HWND) {}
+		inline void DummySetWindowEraseBgSubclass(HWND) {}
+		inline void DummyRemoveWindowEraseBgSubclass(HWND) {}
 
-	inline void DummySetWindowCtlColorSubclass(HWND) {}
-	inline void DummyRemoveWindowCtlColorSubclass(HWND) {}
+		inline void DummySetWindowCtlColorSubclass(HWND) {}
+		inline void DummyRemoveWindowCtlColorSubclass(HWND) {}
 
-	inline void DummySetWindowNotifyCustomDrawSubclass(HWND) {}
-	inline void DummyRemoveWindowNotifyCustomDrawSubclass(HWND) {}
+		inline void DummySetWindowNotifyCustomDrawSubclass(HWND) {}
+		inline void DummyRemoveWindowNotifyCustomDrawSubclass(HWND) {}
 
-	inline void DummySetWindowMenuBarSubclass(HWND) {}
-	inline void DummyRemoveWindowMenuBarSubclass(HWND) {}
+		inline void DummySetWindowMenuBarSubclass(HWND) {}
+		inline void DummyRemoveWindowMenuBarSubclass(HWND) {}
 
-	inline void DummySetWindowSettingChangeSubclass(HWND) {}
-	inline void DummyRemoveWindowSettingChangeSubclass(HWND) {}
+		inline void DummySetWindowSettingChangeSubclass(HWND) {}
+		inline void DummyRemoveWindowSettingChangeSubclass(HWND) {}
 
-	inline void DummyEnableSysLinkCtrlCtlColor(HWND) {}
+		inline void DummyEnableSysLinkCtrlCtlColor(HWND) {}
 
-	inline void DummySetDarkTitleBarEx(HWND, bool) {}
-	inline void DummySetDarkTitleBar(HWND) {}
+		inline void DummySetDarkTitleBarEx(HWND, bool) {}
+		inline void DummySetDarkTitleBar(HWND) {}
 
-	inline const wchar_t* DummyGetDarkModeThemeName() {return nullptr; }
+		inline const wchar_t* DummyGetDarkModeThemeName() {return nullptr; }
 
-	inline void DummySetDarkThemeExperimentalEx(HWND, const wchar_t*) {}
-	inline void DummySetDarkThemeExperimental(HWND) {}
+		inline void DummySetDarkThemeExperimentalEx(HWND, const wchar_t*) {}
+		inline void DummySetDarkThemeExperimental(HWND) {}
 
-	inline void DummySetDarkExplorerTheme(HWND) {}
-	inline void DummySetDarkScrollBar(HWND) {}
-	inline void DummySetDarkTooltips(HWND, int) {}
-	inline void DummySetDarkThemeTheme(HWND) {}
+		inline void DummySetDarkExplorerTheme(HWND) {}
+		inline void DummySetDarkScrollBar(HWND) {}
+		inline void DummySetDarkTooltips(HWND, int) {}
+		inline void DummySetDarkThemeTheme(HWND) {}
 
-	inline void DummySetDarkLineAbovePanelToolbar(HWND) {}
+		inline void DummySetDarkLineAbovePanelToolbar(HWND) {}
 
-	inline void DummySetDarkListView(HWND) {}
-	inline void DummySetDarkListViewCheckboxes(HWND) {}
+		inline void DummySetDarkListView(HWND) {}
+		inline void DummySetDarkListViewCheckboxes(HWND) {}
 
-	inline void DummySetDarkTreeViewCheckboxes(HWND) {}
+		inline void DummySetDarkTreeViewCheckboxes(HWND) {}
 
-	inline void DummySetDarkRichEdit(HWND) {}
-	inline void DummySetDarkMonthCalendar(HWND) {}
+		inline void DummySetDarkRichEdit(HWND) {}
+		inline void DummySetDarkMonthCalendar(HWND) {}
 
-	inline void DummySetDarkWndSafeEx(HWND, bool) {}
-	inline void DummySetDarkWndSafe(HWND) {}
-	inline void DummySetDarkWndNotifySafeEx(HWND, bool, bool) {}
-	inline void DummySetDarkWndNotifySafe(HWND) {}
+		inline void DummySetDarkWndSafeEx(HWND, bool) {}
+		inline void DummySetDarkWndSafe(HWND) {}
+		inline void DummySetDarkWndNotifySafeEx(HWND, bool, bool) {}
+		inline void DummySetDarkWndNotifySafe(HWND) {}
 
-	inline void DummyEnableThemeDialogTexture(HWND, bool) {}
+		inline void DummyEnableThemeDialogTexture(HWND, bool) {}
 
-	inline void DummyDisableVisualStyle(HWND, bool) {}
-	[[nodiscard]] inline double DummyCalculatePerceivedLightness(COLORREF) { return 0.0; }
-	[[nodiscard]] inline int DummyGetTreeViewStyle() { return -1; }
-	inline void DummyCalculateTreeViewStyle() {}
-	inline void DummySetTreeViewWindowThemeEx(HWND, bool) {}
-	inline void DummySetTreeViewWindowTheme(HWND) {}
-	[[nodiscard]] inline int DummyGetPrevTreeViewStyle() { return -1; }
-	inline void DummySetPrevTreeViewStyle() {}
+		inline void DummyDisableVisualStyle(HWND, bool) {}
+		[[nodiscard]] inline double DummyCalculatePerceivedLightness(COLORREF) { return 0.0; }
+		[[nodiscard]] inline int DummyGetTreeViewStyle() { return -1; }
+		inline void DummyCalculateTreeViewStyle() {}
+		inline void DummySetTreeViewWindowThemeEx(HWND, bool) {}
+		inline void DummySetTreeViewWindowTheme(HWND) {}
+		[[nodiscard]] inline int DummyGetPrevTreeViewStyle() { return -1; }
+		inline void DummySetPrevTreeViewStyle() {}
 
-	[[nodiscard]] inline bool DummyIsThemeDark() { return false; }
-	[[nodiscard]] inline bool DummyIsColorDark(COLORREF) { return false; }
+		[[nodiscard]] inline bool DummyIsThemeDark() { return false; }
+		[[nodiscard]] inline bool DummyIsColorDark(COLORREF) { return false; }
 
-	inline void DummyRedrawWindowFrame(HWND) {}
+		inline void DummyRedrawWindowFrame(HWND) {}
 
-	inline void DummySetWindowStyle(HWND, bool, LONG_PTR) {}
-	inline void DummySetWindowExStyle(HWND, bool, LONG_PTR) {}
-	inline void DummyReplaceExEdgeWithBorder(HWND, bool, LONG_PTR) {}
-	inline void DummyReplaceClientEdgeWithBorderSafeEx(HWND) {}
-	inline void DummyReplaceClientEdgeWithBorderSafe(HWND) {}
+		inline void DummySetWindowStyle(HWND, bool, LONG_PTR) {}
+		inline void DummySetWindowExStyle(HWND, bool, LONG_PTR) {}
+		inline void DummyReplaceExEdgeWithBorder(HWND, bool, LONG_PTR) {}
+		inline void DummyReplaceClientEdgeWithBorderSafeEx(HWND) {}
+		inline void DummyReplaceClientEdgeWithBorderSafe(HWND) {}
 
-	inline void DummySetProgressBarClassicTheme(HWND) {}
+		inline void DummySetProgressBarClassicTheme(HWND) {}
 
-	[[nodiscard]] inline LRESULT DummyOnCtlColor(HDC) { return FALSE; }
-	[[nodiscard]] inline LRESULT DummyOnCtlColorCtrl(HDC) { return FALSE; }
-	[[nodiscard]] inline LRESULT DummyOnCtlColorDlg(HDC) { return FALSE; }
-	[[nodiscard]] inline LRESULT DummyOnCtlColorError(HDC) { return FALSE; }
-	[[nodiscard]] inline LRESULT DummyOnCtlColorDlgStaticText(HDC, bool) { return FALSE; }
-	[[nodiscard]] inline LRESULT DummyOnCtlColorDlgLinkText(HDC, bool) { return FALSE; }
-	[[nodiscard]] inline LRESULT DummyOnCtlColorListbox(WPARAM, LPARAM) { return FALSE; }
+		[[nodiscard]] inline LRESULT DummyOnCtlColor(HDC) { return FALSE; }
+		[[nodiscard]] inline LRESULT DummyOnCtlColorCtrl(HDC) { return FALSE; }
+		[[nodiscard]] inline LRESULT DummyOnCtlColorDlg(HDC) { return FALSE; }
+		[[nodiscard]] inline LRESULT DummyOnCtlColorError(HDC) { return FALSE; }
+		[[nodiscard]] inline LRESULT DummyOnCtlColorDlgStaticText(HDC, bool) { return FALSE; }
+		[[nodiscard]] inline LRESULT DummyOnCtlColorDlgLinkText(HDC, bool) { return FALSE; }
+		[[nodiscard]] inline LRESULT DummyOnCtlColorListbox(WPARAM, LPARAM) { return FALSE; }
 
-	inline UINT_PTR CALLBACK DummyHookDlgProc(HWND, UINT, WPARAM, LPARAM) { return 0; }
-	inline void DummySetDarkTaskDlg(HWND) {}
-	inline HRESULT CALLBACK DummyDarkTaskDlgCallback(HWND, UINT, WPARAM, LPARAM, LONG_PTR) { return S_OK; }
-	inline HRESULT DummyDarkTaskDialogIndirect(const TASKDIALOGCONFIG*, int*, int*, BOOL*) { return S_OK; }
-	inline int DummyDarkMessageBoxW(HWND , LPCWSTR , LPCWSTR , UINT ) { return 0; }
+		inline UINT_PTR CALLBACK DummyHookDlgProc(HWND, UINT, WPARAM, LPARAM) { return 0; }
+		inline void DummySetDarkTaskDlg(HWND) {}
+		inline HRESULT CALLBACK DummyDarkTaskDlgCallback(HWND, UINT, WPARAM, LPARAM, LONG_PTR) { return S_OK; }
+		inline HRESULT DummyDarkTaskDialogIndirect(const TASKDIALOGCONFIG*, int*, int*, BOOL*) { return S_OK; }
+		inline int DummyDarkMessageBoxW(HWND , LPCWSTR , LPCWSTR , UINT ) { return 0; }
+	}
 
 	using fnGetLibInfo = auto (*)(int libInfoType) -> int;
 	inline fnGetLibInfo getLibInfo = nullptr;

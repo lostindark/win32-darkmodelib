@@ -14,6 +14,12 @@
 
 #include <windows.h>
 
+#if (defined(_MSC_VER) && (_MSVC_LANG >= 202002L)) || (__cplusplus >= 202002L)
+#include <bit>
+#else
+#include <cstring>
+#endif
+
 namespace dmlib_module
 {
 	template <typename P>
@@ -22,7 +28,12 @@ namespace dmlib_module
 		if (auto proc = ::GetProcAddress(handle, name);
 			proc != nullptr)
 		{
-			pointer = reinterpret_cast<P>(reinterpret_cast<INT_PTR>(proc));
+#if (defined(_MSC_VER) && (_MSVC_LANG >= 202002L)) || (__cplusplus >= 202002L)
+			pointer = std::bit_cast<P>(proc);
+#else
+			static_assert(sizeof(P) == sizeof(proc));
+			std::memcpy(&pointer, &proc, sizeof(P));
+#endif
 			return true;
 		}
 		return false;

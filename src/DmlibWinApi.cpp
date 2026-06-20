@@ -111,7 +111,7 @@ using fnRefreshImmersiveColorPolicyState = void (WINAPI*)(); // ordinal 104
 using fnGetIsImmersiveColorUsingHighContrast = auto (WINAPI*)(IMMERSIVE_HC_CACHE_MODE mode) -> bool; // ordinal 106
 
 // 1903 18362
-using fnSetPreferredAppMode = auto (WINAPI*)(PreferredAppMode appMode)->PreferredAppMode; // ordinal 135, in 1903
+using fnSetPreferredAppMode = auto (WINAPI*)(PreferredAppMode appMode) -> PreferredAppMode; // ordinal 135, in 1903
 
 #if defined(_DARKMODELIB_ALLOW_OLD_OS) && (_DARKMODELIB_ALLOW_OLD_OS > 0)
 static fnSetWindowCompositionAttribute pfSetWindowCompositionAttribute = nullptr;
@@ -469,13 +469,14 @@ void dmlib_win32api::SetDarkMode(bool useDark, [[maybe_unused]] bool applyScroll
 	}
 }
 
-static LPCWSTR WINAPI DummyMB_GetString([[maybe_unused]] UINT wBtn) noexcept
+extern "C"
 {
-	return nullptr;
+	static LPCWSTR WINAPI DummyMB_GetString([[maybe_unused]] UINT wBtn) noexcept
+	{
+		return nullptr;
+	}
 }
-
-using fnMB_GetString = auto (WINAPI*)(UINT) -> LPCWSTR;
-static fnMB_GetString pfMB_GetString = DummyMB_GetString;
+static decltype(&DummyMB_GetString) pfMB_GetString = DummyMB_GetString;
 
 /**
  * @brief Initializes undocumented MB_GetString.

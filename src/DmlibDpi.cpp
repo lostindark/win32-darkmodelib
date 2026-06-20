@@ -23,16 +23,6 @@
 
 #include "ModuleHelper.h"
 
-using fnGetDpiForSystem = auto (WINAPI*)(VOID) -> UINT;
-using fnGetDpiForWindow = auto (WINAPI*)(HWND hwnd) -> UINT;
-using fnGetSystemMetricsForDpi = auto (WINAPI*)(int nIndex, UINT dpi) -> int;
-using fnSystemParametersInfoForDpi = auto (WINAPI*)(UINT uiAction, UINT uiParam, PVOID pvParam, UINT fWinIni, UINT dpi) -> BOOL;
-using fnIsValidDpiAwarenessContext = auto (WINAPI*)(DPI_AWARENESS_CONTEXT value) -> BOOL;
-using fnSetThreadDpiAwarenessContext = auto (WINAPI*)(DPI_AWARENESS_CONTEXT dpiContext) -> DPI_AWARENESS_CONTEXT;
-using fnAdjustWindowRectExForDpi = auto (WINAPI*)(LPRECT lpRect, DWORD dwStyle, BOOL bMenu, DWORD dwExStyle, UINT dpi) -> BOOL;
-
-using fnOpenThemeDataForDpi = auto (WINAPI*)(HWND hwnd, LPCWSTR pszClassList, UINT dpi) -> HTHEME;
-
 extern "C"
 {
 	static UINT WINAPI DummyGetDpiForSystem() noexcept
@@ -82,14 +72,14 @@ extern "C"
 	}
 }
 
-static fnGetDpiForSystem pfGetDpiForSystem = DummyGetDpiForSystem;
-static fnGetDpiForWindow pfGetDpiForWindow = DummyGetDpiForWindow;
-static fnGetSystemMetricsForDpi pfGetSystemMetricsForDpi = DummyGetSystemMetricsForDpi;
-static fnSystemParametersInfoForDpi pfSystemParametersInfoForDpi = DummySystemParametersInfoForDpi;
-static fnIsValidDpiAwarenessContext pfIsValidDpiAwarenessContext = DummyIsValidDpiAwarenessContext;
-static fnSetThreadDpiAwarenessContext pfSetThreadDpiAwarenessContext = DummySetThreadDpiAwarenessContext;
-static fnAdjustWindowRectExForDpi pfAdjustWindowRectExForDpi = DummyAdjustWindowRectExForDpi;
-static fnOpenThemeDataForDpi pfOpenThemeDataForDpi = DummyOpenThemeDataForDpi;
+static decltype(&DummyGetDpiForSystem) pfGetDpiForSystem = DummyGetDpiForSystem;
+static decltype(&DummyGetDpiForWindow) pfGetDpiForWindow = DummyGetDpiForWindow;
+static decltype(&DummyGetSystemMetricsForDpi) pfGetSystemMetricsForDpi = DummyGetSystemMetricsForDpi;
+static decltype(&DummySystemParametersInfoForDpi) pfSystemParametersInfoForDpi = DummySystemParametersInfoForDpi;
+static decltype(&DummyIsValidDpiAwarenessContext) pfIsValidDpiAwarenessContext = DummyIsValidDpiAwarenessContext;
+static decltype(&DummySetThreadDpiAwarenessContext) pfSetThreadDpiAwarenessContext = DummySetThreadDpiAwarenessContext;
+static decltype(&DummyAdjustWindowRectExForDpi) pfAdjustWindowRectExForDpi = DummyAdjustWindowRectExForDpi;
+static decltype(&DummyOpenThemeDataForDpi) pfOpenThemeDataForDpi = DummyOpenThemeDataForDpi;
 
 bool dmlib_dpi::InitDpiAPI() noexcept
 {

@@ -41,10 +41,6 @@ namespace dmlib_win32api
 
 using fnFindThunkInModule = auto (*)(void* moduleBase, const char* dllName, const char* funcName) -> PIMAGE_THUNK_DATA;
 
-using fnGetSysColor = auto (WINAPI*)(int nIndex) -> DWORD;
-using fnGetThemeColor = auto (WINAPI*)(HTHEME hTheme, int iPartId, int iStateId, int iPropId, COLORREF* pColor) -> HRESULT;
-using fnDrawThemeBackgroundEx = auto (WINAPI*)(HTHEME hTheme, HDC hdc, int iPartId, int iStateId, LPCRECT pRect, const DTBGOPTS* pOptions) -> HRESULT;
-
 template <typename P>
 static auto ReplaceFunction(IMAGE_THUNK_DATA* addr, const P& newFunction) noexcept -> P
 {
@@ -252,7 +248,7 @@ void dmlib_hook::fixDarkScrollBar()
 // Hooking GetSysColor for combo box ex' list box and list view's gridlines
 
 
-static HookData<fnGetSysColor> g_hookDataGetSysColor{};
+static HookData<decltype(&::GetSysColor)> g_hookDataGetSysColor{};
 
 static COLORREF g_clrWindow = RGB(32, 32, 32);
 static COLORREF g_clrText = RGB(224, 224, 224);
@@ -337,7 +333,7 @@ static DWORD WINAPI MyGetSysColor(int nIndex) noexcept
  */
 bool dmlib_hook::hookSysColor() noexcept
 {
-	return HookFunction<fnGetSysColor>(
+	return HookFunction<decltype(&::GetSysColor)>(
 		g_hookDataGetSysColor,
 		MyGetSysColor,
 		"user32.dll",
@@ -354,13 +350,13 @@ bool dmlib_hook::hookSysColor() noexcept
  */
 void dmlib_hook::unhookSysColor() noexcept
 {
-	UnhookFunction<fnGetSysColor>(g_hookDataGetSysColor);
+	UnhookFunction<decltype(&::GetSysColor)>(g_hookDataGetSysColor);
 }
 
 // Hooking GetThemeColor for Task Dialog text color
 
-static HookData<fnGetThemeColor> g_hookDataGetThemeColor{};
-static HookData<fnDrawThemeBackgroundEx> g_hookDataDrawThemeBackgroundEx{};
+static HookData<decltype(&::GetThemeColor)> g_hookDataGetThemeColor{};
+static HookData<decltype(&::DrawThemeBackgroundEx)> g_hookDataDrawThemeBackgroundEx{};
 
 static constexpr COLORREF kMainInstructionTextClr = RGB(96, 205, 255);
 static constexpr COLORREF kOtherTextClr = RGB(255, 255, 255);
@@ -500,12 +496,12 @@ bool dmlib_hook::hookThemeColor() noexcept
 	}
 
 	return
-		HookFunction<fnGetThemeColor>(g_hookDataGetThemeColor,
+		HookFunction<decltype(&::GetThemeColor)>(g_hookDataGetThemeColor,
 			MyGetThemeColor,
 			"uxtheme.dll",
 			static_cast<const char*>("GetThemeColor"),
 			static_cast<fnFindThunkInModule>(iat_hook::FindDelayLoadThunkInModule))
-		&& HookFunction<fnDrawThemeBackgroundEx>(g_hookDataDrawThemeBackgroundEx,
+		&& HookFunction<decltype(&::DrawThemeBackgroundEx)>(g_hookDataDrawThemeBackgroundEx,
 			MyDrawThemeBackgroundEx,
 			"uxtheme.dll",
 			kDrawThemeBackgroundExOrdinal);
@@ -521,8 +517,8 @@ bool dmlib_hook::hookThemeColor() noexcept
  */
 void dmlib_hook::unhookThemeColor() noexcept
 {
-	UnhookFunction<fnGetThemeColor>(g_hookDataGetThemeColor);
-	UnhookFunction<fnDrawThemeBackgroundEx>(g_hookDataDrawThemeBackgroundEx);
+	UnhookFunction<decltype(&::GetThemeColor)>(g_hookDataGetThemeColor);
+	UnhookFunction<decltype(&::DrawThemeBackgroundEx)>(g_hookDataDrawThemeBackgroundEx);
 	if (g_hDarkTheme != nullptr && g_hookDataGetThemeColor.m_ref == 0)
 	{
 		::CloseThemeData(g_hDarkTheme);
