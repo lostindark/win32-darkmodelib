@@ -23,6 +23,13 @@
 
 #include "ModuleHelper.h"
 
+// When _DARKMODELIB_EXTERNAL_DPI is defined, the host application provides the
+// dmlib_dpi function implementations (e.g. by reusing DPI functions it has
+// already resolved), so this translation unit is compiled out to avoid loading
+// the same system functions twice. See DmlibDpi.h for the list of functions the
+// host must then define.
+#ifndef _DARKMODELIB_EXTERNAL_DPI
+
 extern "C"
 {
 	static UINT WINAPI DummyGetDpiForSystem() noexcept
@@ -228,3 +235,5 @@ DWORD dmlib_dpi::getTextScaleFactor() noexcept
 	}
 	return defaultVal;
 }
+
+#endif // !defined(_DARKMODELIB_EXTERNAL_DPI)

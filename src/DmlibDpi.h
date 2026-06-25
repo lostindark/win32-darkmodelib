@@ -51,6 +51,20 @@ namespace dmlib_dpi
 	inline constexpr UINT kDefaultFontDpi = 72;
 	inline constexpr UINT kDefaultFontScaleFactor = 100;
 
+	/**
+	 * @brief Wrappers around the per-monitor DPI v2 system API.
+	 *
+	 * By default the non-inline functions declared below are implemented in
+	 * DmlibDpi.cpp, which resolves the underlying system functions dynamically
+	 * (with fallbacks for systems older than Windows 10).
+	 *
+	 * If the macro `_DARKMODELIB_EXTERNAL_DPI` is defined, DmlibDpi.cpp is
+	 * compiled out and the host application must provide the definitions of
+	 * these non-inline functions. This avoids resolving the DPI functions twice
+	 * when the host already loads them itself (for example an application that
+	 * ships its own DPI helper layer). The inline helpers in this header are
+	 * unaffected and keep working on top of the host-provided functions.
+	 */
 	bool InitDpiAPI() noexcept;
 
 	[[nodiscard]] UINT GetDpiForSystem() noexcept;
